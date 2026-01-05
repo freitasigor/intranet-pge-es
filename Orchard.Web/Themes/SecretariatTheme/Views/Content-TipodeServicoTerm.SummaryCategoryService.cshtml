@@ -1,0 +1,101 @@
+﻿@using Orchard.Taxonomies.Models;
+@using Orchard.Taxonomies.Services;
+@using Orchard.Utility.Extensions;
+@using Orchard.Mvc.Html;
+@using System.Linq;
+@using Orchard.ContentManagement;
+@{
+
+
+    // @Display(BuildDisplay(Model.ContentItem, "DetailCategoryService"))
+    var title = "";
+    var icon = "";
+    var urlServico = "javascript:void(0);";
+    var target = "_self";
+
+
+    try
+    {
+
+        if (!String.IsNullOrEmpty(Model.ContentItem.TermPart.Name))
+        {
+            title = Model.ContentItem.TermPart.Name;
+        }
+        if (!String.IsNullOrEmpty(Model.ContentItem.TipodeServicoTerm.Icone.Value))
+        {
+            icon = "icon-" + Model.ContentItem.TipodeServicoTerm.Icone.Value + "-circle-o";
+        }
+
+    }
+    catch (System.Exception ex) { } 
+
+
+    try
+    {
+        List<Orchard.ContentManagement.ContentItem> listContentItems = new List<Orchard.ContentManagement.ContentItem>();
+
+        //Count items with specific term Taxonomy 
+        var _taxonomyService = WorkContext.Resolve<ITaxonomyService>();
+        var count = _taxonomyService.GetContentItemsCount(Model.ContentItem.TermPart);
+
+        //get services
+        var contentManager = Model.ContentItem.ContentManager;
+        var servicos = contentManager.HqlQuery().ForType("Servico").ForVersion(VersionOptions.Published).List();
+
+
+        if (count == 1)
+        {
+            //filter services especific term taxonomy
+            foreach (var itemServico in servicos)
+            {
+
+                foreach (var termItem in itemServico.Servico.TipodeServico.Terms)
+                {
+                    if (termItem.Name == Model.ContentItem.TermPart.Name)
+                    {
+                        //listContentItems.Add(itemServico);
+                        //urlServico = itemServico.AutoroutePart.DisplayAlias;
+                        @* URL Slide*@
+                        if (!String.IsNullOrEmpty(itemServico.Servico.Arquivo.FirstMediaUrl))
+                        {
+                            urlServico = itemServico.Servico.Arquivo.FirstMediaUrl;
+                        }
+                        else if (itemServico.Servico.Conteudo.ContentItems.Length > 0)
+                        {
+                            foreach (var contentitems in itemServico.Servico.Conteudo.ContentItems)
+                            {
+                                urlServico = Href("~/") + contentitems.AutoroutePart.DisplayAlias;
+                            }
+                        }
+                        else if (!String.IsNullOrEmpty(itemServico.Servico.LinkExterno.Value))
+                        {
+                            urlServico = itemServico.Servico.LinkExterno.Value;
+                        }
+
+                        @* Target Slide*@
+                        if (itemServico.Servico.AbriremNovaJanela.Value == "Sim")
+                        {
+                            target = "_blank";
+                        }
+
+                        break;
+                    }
+
+                }
+
+            }
+        }
+        else { 
+            urlServico = Href("~/" + Model.ContentItem.AutoroutePart.DisplayAlias);
+        }
+    }
+    catch (System.Exception ex) { }  
+
+
+}
+
+<a href="@urlServico" target="@target" title="Ir para @title">
+    <i class="prodesticons @icon"></i><span>@title</span>
+</a>
+
+

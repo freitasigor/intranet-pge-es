@@ -1,0 +1,233 @@
+﻿@using Orchard.Taxonomies.Models;
+@using Orchard.Core.Title.Models;
+@using Orchard.ContentManagement;
+@using Orchard.Utility.Extensions;
+@using Orchard.Mvc.Html;
+@using System.Linq;
+@using System.Linq.Expressions;
+@using Orchard.DisplayManagement;
+
+@{
+    var tag = Tag(Model, "div");
+    var contentTypeClassName = ((string)Model.ContentItem.ContentType).HtmlClassify();
+    Model.List.Classes.Add(contentTypeClassName);
+    var list = Model.ContentItems;
+    var contentManager = Model.ContentItem.ContentManager;
+    var index = 0;
+    bool existImagemDestaque = false;
+    string txtPesquisar = "";
+
+    /*Init*/
+    Orchard.ContentManagement.ContentItem[] listContentQuery = contentManager.HqlQuery().ForType("Link").ForVersion(VersionOptions.Published).List();
+    Func<ContentItem, bool> init = s => s != null;
+    var listContentItem = listContentQuery.Where(new Func<ContentItem, bool>(init));
+
+
+}
+
+@{
+    if (HttpContext.Current.Request.HttpMethod == "POST")
+    {
+        txtPesquisar = Request.Form["txtPesquisar"];
+
+        /*Init*/
+        //Orchard.ContentManagement.ContentItem[] listContentQuery = contentManager.HqlQuery().ForType("Link").ForVersion(VersionOptions.Published).Contains.List();
+        //Func<ContentItem, bool> init = s => s != null;
+        //listContentItem = listContentQuery.Where(new Func<ContentItem, bool>(init));
+
+        /*txtPesquisar*/
+        if (!String .IsNullOrEmpty(txtPesquisar))
+        {
+
+            Func<ContentItem, bool> funcContentItem = s => s.As<TitlePart>().Title.ToLower().Contains(txtPesquisar.ToLower());
+
+            listContentItem = listContentItem.Where(new Func<ContentItem, bool>(funcContentItem));
+
+        }
+
+    }
+}
+
+@try
+{
+    if (Model.ContentItem.ListadeLinks.HabilitarPesquisa.Value == true)
+    {
+        <div class="row">
+            <form method="post" class="filter-licitacao filter-files">
+                <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12 filter-group">
+                    <label>Palavra(s) a ser(em) pesquisada(s):</label>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-10 col-md-10 col-lg-10" style="margin-bottom: 5px;">
+                            <input type="text" class="form-control" id="txtPesquisar" name="txtPesquisar" placeholder="Pesquisar">
+                        </div>
+                        <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                            <button if="btnPesquisar" type="submit" class="btn btn-default">Pesquisar</button>
+                            <input name="__RequestVerificationToken" type="hidden" value="@Html.AntiForgeryTokenValueOrchard()" />
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <br />
+            <br />
+        </div>
+
+    }
+}
+catch (System.Exception ex) { }
+
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <div class="@contentTypeClassName table-individual ">
+
+            @if (listContentItem.Count() == 0 && !String.IsNullOrEmpty(txtPesquisar))
+            {
+                <div>Nenhum resultado encontrado.</div>
+
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-striped table-hover table-downloads">
+                        <thead class="">
+                            <tr>
+                                @try
+                                {
+
+                                    foreach (var content in Model.List.Items)
+                                    {
+                                        /*Imagem de destaque*/
+                                        foreach (var fields in content.ContentItem.ImagemPart.Fields)
+                                        {
+                                            foreach (var image in fields.MediaParts)
+                                            {
+                                                existImagemDestaque = true;
+                                            }
+                                        }
+                                    }
+                                    if (existImagemDestaque)
+                                    {
+                                        <th></th>}
+
+                                }
+                                catch (System.Exception ex) { }
+                                <th>
+                                    @try
+                                    {
+                                        if (!String.IsNullOrEmpty(Model.ContentItem.ListadeLinks.TextodoCabecalho.Value))
+                                        {
+                                            @Model.ContentItem.ListadeLinks.TextodoCabecalho.Value
+                                            <span class="directional-sort">
+                                                <i class="fa fa-caret-up"></i>
+                                                <i class="fa fa-caret-down"></i>
+                                            </span>
+                                        }
+                                    }
+                                    catch (System.Exception ex) { }
+                                </th>
+                                @try
+                                {
+                                    if (!String.IsNullOrEmpty(Model.ContentItem.ListadeLinks.TextodoBotao.Value))
+                                    {
+                                        <th class="coluna-5"></th>
+                                    }
+                                }
+                                catch (System.Exception ex){ }
+                                
+                            </tr>
+                        </thead>
+                        <tbody id="container-links">
+                            @try
+                            {
+
+                                if (txtPesquisar == "")
+                                {
+                                    foreach (var content in Model.List.Items)
+                                    {
+                                        var attr = "";
+
+                                        try
+                                        {
+                                            if (index == 0) { attr += "first"; }
+
+                                            <tr class="@attr">
+                                                @if (existImagemDestaque)
+                                                {
+                                                    @Display(BuildDisplay(content.​ContentItem, "SummaryLinkImage"))
+                                                }
+                                                else
+                                                {
+                                                    @Display(BuildDisplay(content.​ContentItem, "Summary"))
+                                                }
+                                            </tr>
+
+                                            ++index;
+
+                                        }
+                                        catch (System.Exception ex) { ++index; }
+
+                                    }
+
+
+
+                                }
+                                else
+                                {
+                                    foreach (var contentItem in listContentItem)
+                                    {
+                                        var attr = "";
+
+                                        try
+                                        {
+                                            if (index == 0) { attr += "first"; }
+
+                                            <tr class="@attr">
+                                                @if (existImagemDestaque)
+                                                {
+                                                    @Display(BuildDisplay(contentItem, "SummaryLinkImage"))
+                                                }
+                                                else
+                                                {
+                                                    @Display(BuildDisplay(contentItem, "Summary"))
+                                                }
+                                            </tr>
+
+                                            ++index;
+
+                                        }
+                                        catch (System.Exception ex) { ++index; }
+
+                                    }
+
+
+                                }
+
+                            }
+
+                            catch (System.Exception ex) { }
+
+                        </tbody>
+                    </table>
+
+                </div>
+            }
+       
+            @if (txtPesquisar == "")
+            {
+                @Display(Model.Pager)
+            }
+            else
+            {
+                <div class="row"><div class="span-12 col-lg-12"><ul data-container="container-links" class="pager list-pagination"></ul></div></div>
+            }
+
+        </div>
+
+
+
+        @*@Display(Model.List)*@
+
+    </div>
+</div>

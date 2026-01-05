@@ -1,0 +1,19 @@
+﻿@try
+{
+
+    if (!String.IsNullOrEmpty(Model.ContentItem.HtmlWidget.ExibiremDispositivoMovel.Value))
+    {
+        if (Model.ContentItem.HtmlWidget.ExibiremDispositivoMovel.Value != "Sim")
+        {
+            Model.Classes.Add("hidden-xs hidden-sm");
+        }
+    }
+
+    @Display(Model.Content)
+
+}
+catch { 
+    @Display(Model.Content)
+}
+
+

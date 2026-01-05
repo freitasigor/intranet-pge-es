@@ -1,0 +1,85 @@
+﻿@using Orchard.Utility.Extensions;
+@{
+    if (Model.Title != null) {
+        Layout.Title = Model.Title;
+    }
+
+    Model.Classes.Add("content-item");
+    Model.Classes.Add("list-content-item");
+
+    var contentTypeClassName = ((string)Model.ContentItem.ContentType).HtmlClassify();
+    Model.Classes.Add(contentTypeClassName);
+
+    var tag = Tag(Model, "article");
+
+    var containImage = "";
+    var urlImage = "";
+    var widthCol = "10";
+    var widthColMd = "9";
+    var widthColSm = "8";
+}
+@tag.StartElement
+
+
+
+
+
+    <div class="row content-projection">
+
+    @{
+
+           try{
+            
+                    var listFields = Model.ContentItem.ImagemPart.Fields;
+
+                    foreach(var fields in listFields){
+                        foreach(var image in fields.MediaParts){
+                             urlImage = image.MediaUrl;
+                            <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">    
+                                <a href="@Model.ContentItem.AutoroutePart.DisplayAlias" class="thumbnail album-image-item" title="Leia mais" >
+                                    <img src="@Display.ResizeMediaUrl(Width: 155, Height: 117, Mode: "crop", Alignment: "middlecenter", Path: image.MediaUrl)" alt="@image.Title" />
+                                </a>
+                            </div>                                                    
+                        }                                        
+                    }
+        
+
+            }catch(System.Exception ex){} 
+
+    }    
+        
+          @if (urlImage == "") { widthCol = "12"; widthColMd = "12"; widthColSm = "12"; } else { widthCol = "10"; widthColMd = "9"; widthColSm = "8"; containImage = "contain-image"; }
+          <div class="col-xs-12 col-sm-@widthColSm col-md-@widthColMd col-lg-@widthCol content-col @containImage">
+              <div class="row header-projection">
+                  <div class="col-lg-12">
+                      <div class="row">
+                          <div class="metadata col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                              @Display(Model.Header)
+                          </div>
+                      </div>
+
+                      @if (Model.Meta != null)
+                      {
+                          <div class="row">
+                              <div class="metadata col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                  @Display(Model.Meta)
+                              </div>
+                          </div>
+                      }
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                      @Display(Model.Content)
+                  </div>
+              </div>              
+                
+          </div>
+    </div>
+
+    @if(Model.Footer != null) {
+        <footer>
+            @Display(Model.Footer)
+        </footer>
+    }
+@tag.EndElement

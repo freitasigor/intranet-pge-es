@@ -1,0 +1,159 @@
+﻿@using System;
+@using System.Text.RegularExpressions;
+@using JetBrains.Annotations;
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using System.Net;
+@using Orchard.ContentManagement;
+@using Orchard.Utility.Extensions;
+@using Orchard.MediaLibrary.Fields;
+@using System.Linq;
+
+@{
+    if (Model.Title != null) {
+        Layout.Title = Model.Title;
+    }
+
+    var contentTypeClassName = ((string)Model.ContentItem.ContentType).HtmlClassify();
+    Model.Classes.Add("content-item-"+contentTypeClassName);
+    Model.Classes.Add("content-item");
+
+    var content = Model.ContentItem;
+
+    var tag = Tag(Model, "div");
+    tag.AddCssClass("row item-carousel");
+
+    Regex VimeoVideoRegex = new Regex(@"vimeo\.com/(?:channels\/|channels\/\w+\/|groups\/[^\/]*\/videos\/|album‌​\/\d+\/video\/|video\/|)?([0-9]+)", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+    Regex YoutubeVideoRegex = new Regex(@"youtu(?:\.be|be\.com)/(?:.*v(?:/|=)|(?:.*/)?)([a-zA-Z0-9-_]+)", RegexOptions.IgnoreCase);
+}
+@{
+
+    var urlImage = "";
+    var descriptionSlide = "";
+    var urlSlide = "";
+    var target = "_self";
+    var videoRel = "";
+    var title_item = "";
+    var title_link = "Acessar";
+    bool isVideo = false;
+
+    // URL item
+    try
+    {
+        if (!String.IsNullOrEmpty(content.OEmbedPart.Source.ToString())) { urlSlide = content.OEmbedPart.Source.ToString(); }
+    }
+    catch (System.Exception) { }
+
+    // Title item
+    try
+    {
+        if (!String.IsNullOrEmpty(content.MediaPart.Title.ToString())) { title_item = content.MediaPart.Title.ToString(); }
+    }
+    catch (System.Exception) { }
+
+    // Description item
+    try
+    {
+        if (!String.IsNullOrEmpty(content.MediaPart.Caption)) { descriptionSlide = content.MediaPart.Caption; }
+    }
+    catch (System.Exception) { }
+
+    // Background Image item
+    try
+    {
+        if(!String.IsNullOrEmpty(urlSlide))
+        {
+
+            Match youtubeMatch = YoutubeVideoRegex.Match(urlSlide);
+            Match vimeoMatch = VimeoVideoRegex.Match(urlSlide);
+
+            string id = string.Empty;
+
+            if (youtubeMatch.Success)
+            {
+                id = youtubeMatch.Groups[1].Value;
+                urlImage = "http://img.youtube.com/vi/" + id + "/hqdefault.jpg";
+                isVideo = true;
+            }
+
+            if (vimeoMatch.Success)
+            {
+                id = vimeoMatch.Groups[1].Value;
+                /* json treatment - begin*/
+                var json = "";
+                using (WebClient wc = new WebClient()) { json = wc.DownloadString("http://vimeo.com/api/v2/video/" + id + ".json"); }
+                dynamic jsonDeserialized = JsonConvert.DeserializeObject<dynamic>(json);
+                string jsonDeserializedString = ((Newtonsoft.Json.Linq.JContainer)jsonDeserialized).First.ToString();
+                dynamic jsonObj = JObject.Parse(jsonDeserializedString);
+                /* json treatment - end*/
+
+                urlImage = jsonObj.thumbnail_large.Value;
+                isVideo = true;
+            }
+            // Set Video Element
+            if (isVideo)
+            {
+                videoRel = "prettyVideo[gallery2]";
+                title_link = title_item.ToString();
+            }
+            /*
+            Sizes Youtube image
+                http://img.youtube.com/vi/<insert-youtube-video-id-here>/default.jpg
+                http://img.youtube.com/vi/<insert-youtube-video-id-here>/hqdefault.jpg
+                http://img.youtube.com/vi/<insert-youtube-video-id-here>/mqdefault.jpg
+                http://img.youtube.com/vi/<insert-youtube-video-id-here>/sddefault.jpg
+                http://img.youtube.com/vi/<insert-youtube-video-id-here>/maxresdefault.jpg
+            */
+
+        }
+    }
+    catch (System.Exception) { }
+
+}
+
+
+@tag.StartElement
+
+    @{
+
+        <div class="thumbnail bg-img-container hidden-xs">
+            <div class="img">
+                <a href="@urlSlide" title="@title_link" target="@target" rel="@videoRel">
+                    @{
+                        var bgImageDefault = "background-image: url(\"" + Display.ResizeMediaUrl(Width: 420, Height: 315, Mode: "crop", Alignment: "middlecenter", Path: urlImage) + "\");";
+                    }
+                    @if(isVideo){
+                        <span class="text-center bg-img-content" style="@bgImageDefault">
+                            <i class="fa fa-play video-play" style="font-size: 5em;position: relative;left: 0;top: 34%;"></i>
+                        </span>
+                    }else
+                    {
+                        <span class="bg-img-content" style="@bgImageDefault">
+                        </span>
+                    }
+
+                </a>
+            </div>
+        </div>
+    }
+
+    <div class="col-lg-12">
+
+        <div class="date-item-carousel">
+            
+            @if (!((DateTime?)Model.ContentItem.CommonPart.PublishedUtc).HasValue)
+            {
+                @T("Rascunho");
+            }
+            else
+            {
+                @Display.DateTime(DateTimeUtc: Model.ContentItem.CommonPart.CreatedUtc, CustomFormat: T("dd/MM/yyyy"));
+            }
+            
+        </div>
+        <h4 class="title-item-carousel"><a href="@urlSlide" title="@title_link" target="@target" rel="@videoRel">@title_item</a></h4>
+        <p class="excerpt-item-carousel">@descriptionSlide</p>
+        <div class="text-right learn-more" style="min-height: 1px;"></div>
+    </div>
+
+@tag.EndElement

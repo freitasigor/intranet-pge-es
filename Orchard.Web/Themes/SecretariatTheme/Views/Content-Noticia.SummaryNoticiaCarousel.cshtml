@@ -1,0 +1,85 @@
+﻿@using Orchard.ContentManagement;
+@using Orchard.Utility.Extensions;
+@{
+
+
+    var title = "";
+    var excerpts = "";
+    dynamic imageObject = null;
+    var urlImage = "";
+    var widthCol = "12";
+    var classDescription = "";
+
+
+
+    Orchard.ContentManagement.ContentItem contentItem = Model.ContentItem;
+
+    try
+    {
+        title = Model.ContentItem.TitlePart.Title.ToString();
+    }
+    catch (System.Exception) { title = ""; }
+
+    try
+    {
+        string excerptHtml = Model.ContentItem.ResumoPart.Resumo.Value.ToString();
+        var excerptsTemp = new HtmlString(Html.Excerpt(excerptHtml, 180).ToString().Replace(Environment.NewLine, "</p>" + Environment.NewLine + "<p>"));
+        excerpts = excerptsTemp.ToString();
+    }
+    catch (System.Exception) { excerpts = ""; }
+
+    var listFieldsThumb = Model.ContentItem.ImagemPart.Fields;
+
+}
+
+<div class="row-fluid">
+
+    @{
+
+        foreach (var fields in listFieldsThumb)
+        {
+            foreach (var image in fields.MediaParts)
+            {
+                urlImage = image.MediaUrl;
+                imageObject = image;
+            }
+        }
+        if (!String.IsNullOrEmpty(urlImage)) {
+            widthCol = "5";
+            <div class="col-xs-12 col-sm-7 col-md-7 col-lg-7 bg-img-container hidden-xs" style="padding-left:0;padding-right:0;">
+                <a href="@Url.ItemDisplayUrl(contentItem)" title="Leia mais">
+                    @Display(Model.ContentItem.ContentManager.BuildDisplay(imageObject.ContentItem, "SummaryImagemdeDestaqueCarousel"))
+                </a>
+            </div> 
+        }
+        else { 
+            classDescription ="bg-img-content";
+        }           
+    }
+
+    <div class="col-xs-12 col-sm-@widthCol col-md-@widthCol col-lg-@widthCol description-container @classDescription">
+        <div class="top-bar">
+            <span class="bottom-triangle"></span>
+        </div>
+        <div class="carousel-description-vertical">
+            <div class="date-item-carousel">
+                @if (!((DateTime?)Model.ContentItem.CommonPart.PublishedUtc).HasValue)
+                {
+                    @T("Rascunho");
+                }
+                else
+                {
+                    @Display.DateTime(DateTimeUtc: Model.ContentItem.CommonPart.CreatedUtc, CustomFormat: T("dd/MM/yyyy"));
+                }
+            </div>  
+            <h4 class="title-item-carousel text-left"><a href="@Url.ItemDisplayUrl(contentItem)" title="Leia mais">@title</a></h4>                                  
+            @Html.Raw(excerpts)
+            <div class="text-left learn-more" style="margin-top:10px;">
+                <a href="@Url.ItemDisplayUrl(contentItem)" title="Leia mais"><strong>Leia mais <i class="fa fa-chevron-right" style="vertical-align: middle;"></i></strong></a>
+            </div>
+        </div>
+    </div>
+</div>
+                
+
+                           

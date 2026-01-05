@@ -1,0 +1,35 @@
+﻿@using Orchard.Tags.Models
+
+@*
+    <ul class="tag-cloud">
+    @foreach (TagCount tagCount in Model.TagCounts) {
+        <li class="tag-cloud-tag tag-cloud-tag-@tagCount.Bucket">
+            @Html.ActionLink(tagCount.TagName, "Search", "Home", new {
+                    area = "Orchard.Tags",
+                    tagName = tagCount.TagName
+                }, null
+            )
+        </li>
+    }
+    </ul>
+
+*@
+
+<div id="tag-cloud-id" class="tag-cloud-container"></div>
+
+@using (Script.Foot())
+{
+    <script type="text/javascript">
+        var words = [
+            @foreach (TagCount tagCount in Model.TagCounts) {
+                @Html.Raw("{text: \""+@tagCount.TagName+"\", weight: "+ @tagCount.Bucket + ", link: \""+ @HttpUtility.UrlDecode(Url.Action("Search", "Home", new { area = "Orchard.Tags", tagName = tagCount.TagName }, null)) + "\"},")
+            }
+        ];
+
+        $('#tag-cloud-id').jQCloud(words, {
+            delay: 50,
+            autoResize: true,
+            height: 150
+        });
+    </script>
+}

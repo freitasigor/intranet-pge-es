@@ -1,0 +1,134 @@
+@using Orchard.Taxonomies.Models;
+@using Orchard.Core.Title.Models;
+@using Orchard.ContentManagement;
+@using Orchard.Core.Common.Fields;
+@using Orchard.Utility.Extensions;
+@using Orchard.Mvc.Html;
+@using System.Linq;
+@using System.Linq.Expressions;
+@{
+    Model.Id = "licitacoes-" + Model.ContentItem.Id;
+    var tag = Tag(Model, "div");
+    tag.AddCssClass("row-licitacoes");
+    var list = Model.ContentItems;
+    var contentManager = Model.ContentItem.ContentManager;
+
+    bool orchardPager = false;
+    if (Model.ContentItem.ProjectionPart.Record.DisplayPager) { orchardPager = true; }
+
+}
+
+
+@{
+    Dictionary<int, Orchard.Taxonomies.Models.TermPart> modalidadeTerms = new Dictionary<int, Orchard.Taxonomies.Models.TermPart>();
+    var modalidadeQuery = contentManager.HqlQuery().ForType("ModalidadedeLicitacaoTerm").ForVersion(VersionOptions.Published);
+    var listModalidadeQuery = modalidadeQuery.List();
+
+    Dictionary<int, Orchard.Taxonomies.Models.TermPart> situacaoTerms = new Dictionary<int, Orchard.Taxonomies.Models.TermPart>();
+    var situacaoQuery = contentManager.HqlQuery().ForType("SituacaodeLicitacaoTerm").ForVersion(VersionOptions.Published);
+    var listSituacaoQuery = situacaoQuery.List();
+
+    foreach (var termQuery in listModalidadeQuery)
+    {
+        var termItem = ((IContent)termQuery).As<TermPart>();
+        if (termItem.Count > 0 || termItem.Selectable == false){ modalidadeTerms[termItem.Id] = termItem;}
+    }
+
+    foreach (var termQuery in listSituacaoQuery)
+    {
+        var termItem = ((IContent)termQuery).As<TermPart>();
+        if (termItem.Count > 0 || termItem.Selectable == false){ situacaoTerms[termItem.Id] = termItem;}
+
+    }
+}
+
+    <!-- begin Filtro Licitacoes-->
+    <div class="filter-licitacao">
+        <div id="filter-content" data-orchard-pagination="@orchardPager.ToString().ToLower()"> 
+
+            <div class="row">
+                <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12 filter-group">
+                    <h4 class="text-center">Buscar Licitação</h4>
+                    <hr />
+                </div>
+            </div> 
+
+            <div class="row">
+                <div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6 filter-group">
+                    <label>Nº da Licitação</label>
+                    <input class="form-control" type="text" name="numlicitacao" value="" />
+                </div>
+
+                <div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6 filter-group">
+                    <label>Data de Abertura</label>
+                    <input id="dataabertura" class="form-control" type="text" name="dataabertura" value="" />
+                </div>
+            </div>
+            @if (modalidadeTerms.Count > 0)
+            {
+                <div class="row">
+                    <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12  filter-group">
+                        <label>Modalidade</label>
+                        <select name="modalidade" class="form-control filter-select filter-modalidade">
+                            <option value="">Todas</option>
+                            @foreach (KeyValuePair<int, Orchard.Taxonomies.Models.TermPart> term in modalidadeTerms.OrderBy(i => i.Value.Name))
+                            {
+                                if (term.Value.Container.Id != term.Value.TaxonomyId)
+                                {
+                                    <option value="@term.Value.Name">@term.Value.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                </div>
+            }
+            @if (situacaoTerms.Count > 0)
+            {
+                <div class="row">
+                    <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12  filter-group">
+                        <label>Situação</label>
+                        <select name="situacao" class="form-control  filter-select">
+                            <option value="">Todas</option>
+                            @foreach (KeyValuePair<int, Orchard.Taxonomies.Models.TermPart> term in situacaoTerms.OrderBy(i => i.Value.Name))
+                            {
+                                <option value="@term.Value.Name">@term.Value.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            }
+
+            <div class="row">
+                <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12 filter-group">
+                    <label>Palavra-chave</label>
+                    <input class="form-control" type="text" name="palavrachave" value="" />
+                </div>
+            </div>
+
+            <div class="form-group text-right">
+                <button class="btn btn-default submit filter-submit" 
+                        data-filter=".filter-licitacao" 
+                        data-content-container=".row-licitacoes" 
+                        data-content-item=".container-licitacoes" 
+                        data-panel-active="true"  
+                        data-enable-paging="@orchardPager.ToString().ToLower()">Buscar</button>
+            </div>
+            
+        </div> 
+    </div>
+    <!-- end Filtro Licitacoes--> 
+    <div id="loading-image"></div>
+    
+@tag.StartElement
+
+
+    @foreach(var contentItem in list)
+    {
+        @Display(contentManager.BuildDisplay(contentItem, "Summary"))
+    }
+
+@tag.EndElement
+
+@Display(Model.Pager)
+<ul data-container="@Model.Id" class="pager filter-pagination ocult" ></ul>

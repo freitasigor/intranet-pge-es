@@ -1,0 +1,7 @@
+﻿@{
+    string status = "";
+    if (Model.Item.Selected) {
+        status = "active";
+    }
+}
+<a class="dropdown-toggle @status" href="javascript:void(0)"><i class="fa fa-angle-up fa-angle-down"><br class="clearboth" /></i><span>@Model.Text</span></a>

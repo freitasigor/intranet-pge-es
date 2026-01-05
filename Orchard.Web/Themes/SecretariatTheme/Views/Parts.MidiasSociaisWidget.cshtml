@@ -1,0 +1,28 @@
+@{
+
+    var tag = Tag(Model, "div");
+    tag.AddCssClass("oc-social-icon clearfix");
+    var list = Model.MidiasSociais.Modelo;
+
+    @tag.StartElement
+
+    foreach (var item in list)
+    {
+
+        var urlField = "";
+        var target = "_blank";
+        var redesocial = item.nome;
+        urlField = item.url;
+
+        if (!string.IsNullOrEmpty(urlField))
+        {
+            <a title="@redesocial" href="@urlField" target="@target" class="@redesocial">
+                <span class="oc-icon-@redesocial"></span>
+            </a>
+
+        }
+    }
+
+    @tag.EndElement
+
+}

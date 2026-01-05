@@ -1,0 +1,27 @@
+﻿@using Orchard.ContentManagement;
+@using Orchard.Core.Contents;
+@{
+    var contentItem = (ContentItem)Model.ContentItem;
+    var authorizedFor = AuthorizedFor(Permissions.EditContent, contentItem);
+}
+@if (authorizedFor && Model.ContentItem.Id > 0 && Model.ContentItem.ContentType != "Home")
+{
+    if (Model.ContentItem.ContentType == "Link")
+    {
+        <tr class="content-control">
+            @Display(Model.Child)
+            <td class="manage-actions">@Html.ItemEditLinkWithReturnUrl(T("Editar").Text, contentItem)</td>
+        </tr>
+    }
+    else
+    {
+        <div class="content-control">
+            @Display(Model.Child)
+            <div class="manage-actions">@Html.ItemEditLinkWithReturnUrl(T("Editar").Text, contentItem)</div>
+            <div class="clearfix"></div>
+        </div>
+    }
+}
+else {
+    @Display(Model.Child)
+}

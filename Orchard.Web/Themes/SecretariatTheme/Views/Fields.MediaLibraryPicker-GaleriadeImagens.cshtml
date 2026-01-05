@@ -1,0 +1,33 @@
+﻿@using Orchard.ContentManagement
+@using Orchard.MediaLibrary.Fields
+@using Orchard.Utility.Extensions;
+
+@{
+    var field = (MediaLibraryPickerField) Model.ContentField;
+    string name = field.DisplayName;
+    var contents = field.MediaParts;
+    var contentManager = Model.ContentItem.ContentManager;
+}
+
+
+<section class="row gallery image-gallery media-library-picker-field media-library-picker-field-@name.HtmlClassify()">
+    <div class="span-12 col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <ul class="pgwSlideshow">
+            @foreach (var content in contents)
+            {
+                
+                <li>
+                    @Display(contentManager.BuildDisplay(content.ContentItem, "SummaryImageGallery"))
+                </li>
+
+            }
+        </ul>
+    </div>
+</section>
+
+
+
+
+
+
+

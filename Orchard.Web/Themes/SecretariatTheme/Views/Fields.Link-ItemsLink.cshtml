@@ -1,0 +1,33 @@
+﻿@using Orchard.Fields.Settings
+@using Orchard.Utility.Extensions;
+@{
+    string name = Model.ContentField.DisplayName;
+    LinkFieldSettings settings = Model.ContentField.PartFieldDefinition.Settings.GetModel<LinkFieldSettings>();
+    string text = Model.ContentField.Text;
+    switch(settings.LinkTextMode) {
+        case LinkTextMode.Static:
+            text = settings.StaticText;
+            break;
+        case LinkTextMode.Url:
+            text = Model.ContentField.Value;
+            break;
+        case LinkTextMode.Optional:
+            if (String.IsNullOrWhiteSpace(text)) {
+                text = Model.ContentField.Value;
+            }
+            break;
+    }
+
+    string UrlItem = Href("~/" + Model.ContentField.Value);
+
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.ContentField.Value) && !string.IsNullOrWhiteSpace(text) ){
+
+<div class="row">
+    <div class="col-lg-12 link-read-more link-field link-field-@name.HtmlClassify()">
+        <a title="@text" href="@UrlItem">@text</a>
+    </div>
+</div>
+
+}

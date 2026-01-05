@@ -1,0 +1,63 @@
+﻿@using Orchard.MediaLibrary.Models
+@using Orchard.Utility.Extensions;
+@{
+    MediaPart mediaPart = Model.ContentItem.MediaPart;
+    Layout.Title = mediaPart.Title;
+    var contentTypeClassName = mediaPart.ContentItem.ContentType.HtmlClassify();
+    string resultClass = "list-content-item content-item";
+
+}
+
+@try
+{
+
+    <article class="media-item @resultClass @contentTypeClassName">
+
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+
+                <div class="row">
+                    <div class="metadata col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <h4 class="title-list">
+                            @if (!String.IsNullOrEmpty(Model.ContentItem.MediaPart.Title.ToString()))
+                            {
+                                <a href="@if(!String.IsNullOrEmpty(Model.ContentItem.MediaPart.MediaUrl.ToString())) {@Model.ContentItem.MediaPart.MediaUrl}else{@Html.Raw("javascript:void(0);") } " target="_blank" title="Acessar: @Model.ContentItem.MediaPart.Title">
+                                    @Model.ContentItem.MediaPart.Title
+                                </a>
+                            }
+
+                        </h4>
+                        <div class="published">
+                            <span>Publicado em </span>
+                            @Display.DateTime(DateTimeUtc: Model.ContentItem.CommonPart.CreatedUtc, CustomFormat: T("dd/MM/yyyy"))
+                            @if (!((DateTime?)Model.ContentItem.CommonPart.PublishedUtc).HasValue)
+                            {
+                                @T("Rascunho");
+                            }
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        @if (!String.IsNullOrEmpty(Model.ContentItem.MediaPart.Caption.ToString()))
+                        {
+                            @Model.ContentItem.MediaPart.Caption
+                        }
+                    </div>
+                </div>
+                @if (!String.IsNullOrEmpty(Model.ContentItem.MediaPart.MediaUrl.ToString()))
+                {
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <a style="margin-top:10px;" href="@Model.ContentItem.MediaPart.MediaUrl" class="btn btn-default" title="Baixar: @Model.ContentItem.MediaPart.Title" download>Baixar</a>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+
+    </article>
+}
+catch (System.Exception ex) { } 

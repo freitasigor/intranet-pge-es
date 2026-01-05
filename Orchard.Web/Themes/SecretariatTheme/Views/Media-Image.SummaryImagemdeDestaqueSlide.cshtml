@@ -1,0 +1,117 @@
+﻿@using Orchard.MediaLibrary.Models
+@using Orchard.Utility.Extensions;
+@{
+    MediaPart mediaPart = Model.ContentItem.MediaPart;
+    //Layout.Title = mediaPart.Title;
+    var contentTypeClassName = mediaPart.ContentItem.ContentType.HtmlClassify();
+
+    var verticalPosition = "center";
+    var horizontalPosition = "center";
+    var alignment = "middlecenter";
+    var UrlImage = "";
+
+    try{
+        if (!String.IsNullOrEmpty(Model.ContentItem.MediaPart.MediaUrl))
+        {
+            UrlImage = Model.ContentItem.MediaPart.MediaUrl;
+        }
+    } catch (System.Exception) {}
+
+    try
+    {
+        /*Vertical position*/
+        if (Model.ContentItem.ImagePart.AlinhamentoVerticaldaImagemCustom.Value != null)
+        {
+            verticalPosition = Model.ContentItem.ImagePart.AlinhamentoVerticaldaImagemCustom.Value + "%";
+            if (Model.ContentItem.ImagePart.AlinhamentoVerticaldaImagemCustom.Value > 0)
+            {
+                alignment = "top";
+            }
+            else if (Model.ContentItem.ImagePart.AlinhamentoVerticaldaImagemCustom.Value < 0)
+            {
+                alignment = "bottom";
+            }
+            else { alignment = "middle"; }
+        }
+        else if (!String.IsNullOrEmpty(Model.ContentItem.ImagePart.AlinhamentoVerticaldaImagem.Value))
+        {
+            verticalPosition = Model.ContentItem.ImagePart.AlinhamentoVerticaldaImagem.Value;
+            switch (verticalPosition)
+            {
+                case "Centralizado":
+                    verticalPosition = "center";
+                    alignment = "middle";
+                    break;
+
+                case "Topo":
+                    verticalPosition = "top";
+                    alignment = verticalPosition;
+                    break;
+
+                case "Base":
+                    verticalPosition = "bottom";
+                    alignment = verticalPosition;
+                    break;
+
+                default:
+                    verticalPosition = "center";
+                    alignment = "middle";
+                    break;
+            }
+
+        }
+
+        /*Horizontal position*/
+        if (Model.ContentItem.ImagePart.AlinhamentoHorizontaldaImagemCustom.Value != null)
+        {
+            horizontalPosition = Model.ContentItem.ImagePart.AlinhamentoHorizontaldaImagemCustom.Value + "%";
+            if (Model.ContentItem.ImagePart.AlinhamentoHorizontaldaImagemCustom.Value > 0)
+            {
+                alignment += "left";
+            }
+            else if (Model.ContentItem.ImagePart.AlinhamentoHorizontaldaImagemCustom.Value < 0)
+            {
+                alignment += "right";
+            }
+            else { alignment += "center"; }
+
+        }
+        else if (!String.IsNullOrEmpty(Model.ContentItem.ImagePart.AlinhamentoHorizontaldaImagem.Value))
+        {
+            horizontalPosition = Model.ContentItem.ImagePart.AlinhamentoHorizontaldaImagem.Value;
+            switch (horizontalPosition)
+            {
+                case "Centralizado":
+                    horizontalPosition = "center";
+                    alignment += horizontalPosition;
+                    break;
+
+                case "Esquerda":
+                    horizontalPosition = "left";
+                    alignment += horizontalPosition;
+                    break;
+
+                case "Direita":
+                    horizontalPosition = "right";
+                    alignment += horizontalPosition;
+                    break;
+
+                default:
+                    horizontalPosition = "center";
+                    alignment += horizontalPosition;
+                    break;
+            }
+        }
+    }
+    catch (System.Exception) {}
+
+}
+
+@if (!String.IsNullOrEmpty(UrlImage))
+{
+    var bgImageDefault = "background-image: url(\"" + Display.ResizeMediaUrl(Width: 780, Mode: "crop", Alignment: alignment, Path: UrlImage) + "\");";
+
+    <span class="bg-img-content"
+          style="@bgImageDefault background-position-y:@verticalPosition;background-position-x:@horizontalPosition;background-position:@horizontalPosition @verticalPosition;">
+    </span>
+}

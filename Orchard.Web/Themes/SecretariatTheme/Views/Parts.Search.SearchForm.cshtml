@@ -1,0 +1,18 @@
+﻿@using Orchard.Search.ViewModels;
+
+
+@using (Html.BeginForm("index", "search", new { area = "Orchard.Search" }, FormMethod.Get, new { @class = "search-form" }))
+{
+    <div class="input-group">
+
+        @Html.TextBox("q", (SearchViewModel)Model.ViewModel.Query, new { @class = "form-control", @placeholder = "Buscar" })
+        @Html.Hidden("culture", WorkContext.CurrentCulture)
+        <span class="input-group-btn">
+            <button class="btn btn-default" title="@T("Search")" type="submit"><i class="fa fa-search"></i></button>  
+        </span>
+        <div class="input-group-btn input-group-btn-close">
+            <div class="btn btn-default btn-close-search" title="@T("Close search field")"><i class="fa fa-times"></i></div>
+        </div>
+
+    </div>
+}

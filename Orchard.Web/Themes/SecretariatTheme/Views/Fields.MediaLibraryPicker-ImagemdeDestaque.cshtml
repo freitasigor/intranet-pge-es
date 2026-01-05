@@ -1,0 +1,20 @@
+@using Orchard.ContentManagement
+@using Orchard.MediaLibrary.Fields
+@using Orchard.Utility.Extensions;
+
+@{
+    var field = (MediaLibraryPickerField) Model.ContentField;
+    string name = field.DisplayName;
+    var contents = field.MediaParts;
+    var contentManager = Model.ContentItem.ContentManager;
+}
+
+<section class="row media-library-picker-field media-library-picker-field-@name.HtmlClassify()">
+    @foreach(var content in contents) {
+    <div class="col-lg-12">
+        <div  class="thumbnail container-thumbnail">
+            @Display(contentManager.BuildDisplay(content.ContentItem, "SummaryImagemdeDestaque"))
+        </div>
+    </div>
+    }
+</section>

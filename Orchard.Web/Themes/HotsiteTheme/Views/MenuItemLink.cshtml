@@ -1,0 +1,20 @@
+﻿@{
+    string status = "";
+    if (Model.Item.Selected)
+    {
+        status = "active";
+    }
+    var target = "";
+    try
+    {
+        if ((dynamic)Model.Content.ContentItem.MenuItem.AbriremNovaJanela.Value)
+        {
+            target = "target=_blank";
+        }
+    }
+    catch
+    {
+
+    }
+}
+<a data-scroll class="menu-color-color menu-border-border-color menu-background-color-background-color @status" @target href="@Model.Href"><span>@Model.Text</span></a>

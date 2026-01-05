@@ -1,0 +1,42 @@
+﻿@using Orchard.Environment.Configuration
+@using System.IO;
+@using System.Text;
+@{
+
+    string LogomarcaSrc = WorkContext.Layout.LogomarcaSrc.ToString();
+    var siteName = WorkContext.Layout.SiteName.ToString();
+
+    string nameInstitute = WorkContext.Layout.NomeInstituicao.ToString();
+    string abbreviationInstitute = WorkContext.Layout.SiglaInstituicao.ToString();
+
+}
+
+        
+
+
+            @if (!String.IsNullOrEmpty(LogomarcaSrc))
+            {
+                <a href="@Href("~/")" class="navbar-brand" title="Ir para a Página Inicial">
+                    <img class="logo logo-default logo-width" title="Ir para a Página Inicial" src="@Display.ResizeMediaUrl(Width: 195, Mode: "pad", Alignment: "middlecenter", Path: LogomarcaSrc)" alt="logomarca" />
+                    <img class="logo-thumb" title="Ir para a Página Inicial" src="@Display.ResizeMediaUrl(Height: 50, Mode: "pad", Alignment: "middlecenter", Path: LogomarcaSrc)" alt="logomarca" />
+
+                </a>
+            }
+            else
+            {
+
+                <a href="@Href("~/")" class="name-site-color-color site-name-family-font-family site-name-font-size navbar-brand site-name" title="Ir para a Página Inicial">
+                    @if (!String.IsNullOrEmpty(abbreviationInstitute))
+                    {
+                        @abbreviationInstitute
+                    }
+                    else
+                    {
+                        @WorkContext.CurrentSite.SiteName
+                    }
+                </a>
+            }
+
+
+        
+

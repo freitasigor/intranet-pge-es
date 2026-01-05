@@ -1,0 +1,143 @@
+﻿@using System.Text.RegularExpressions;
+@try{
+
+    var html = Model.Html.ToString();/*old Html*/
+
+    string pattern = @"<img[^>]*?src\s*=\s*[""']?([^'"" >]+?)[ '""][^>]*?>";/*pattern detect img tags in old html*/
+    MatchCollection collection = Regex.Matches(Model.Html.ToString(), pattern);
+    /*list of img tags*/
+    List<Dictionary<string, string>> listImage = new List<Dictionary<string, string>>();
+
+    /*list img attr*/
+    List<string> listAttr = new List<string>();
+    listAttr.Add("width");
+    listAttr.Add("height");
+    listAttr.Add("style");
+    listAttr.Add("photographer");
+    listAttr.Add("alt");
+
+    int index = 0;
+
+    foreach (Match match in collection)
+    {
+        string value = match.Value;
+        Dictionary<string, string> imgAttr = new Dictionary<string, string>();
+        imgAttr.Add("html", value);
+        imgAttr.Add("src", match.Groups[1].Value);
+        imgAttr.Add("width","");
+        imgAttr.Add("height","");
+        imgAttr.Add("style","");
+        imgAttr.Add("photographer","");
+        imgAttr.Add("alt","");
+
+        if(listImage.Any(dic => dic.ContainsValue(value)) == false)
+        {
+            /*extract others attr img*/
+            foreach (string attrImg in listAttr)
+            {
+                        
+                string patternImg = @"<img[^>]*?" + attrImg + @"\s*=\""(.*?)\""[^>]*?>";
+                MatchCollection collectionAttr = Regex.Matches(value, patternImg);
+                foreach (Match matchAttr in collectionAttr)
+                {
+                    imgAttr[attrImg] = matchAttr.Groups[1].Value;
+                }
+            }
+            /*extract style img*/
+            Dictionary<string, string> style = new Dictionary<string, string>();
+            foreach (string kvp in imgAttr["style"].Split(';'))
+            {
+                if (!String.IsNullOrEmpty(kvp))
+                {
+                    style.Add(kvp.Split(':')[0].Trim(), kvp.Split(':')[1]);
+                }
+            }
+
+
+            /*construct new html*/
+            string alignClass = "";
+            string htmlPhotographer = "";
+            string htmlLegend = "";
+
+            if (style.ContainsKey("float"))
+            {
+                if (!String.IsNullOrEmpty(style["float"]))
+                {
+                    string newStyle = "";
+                    switch (style["float"].Trim())
+                    {
+                        case "left":
+                            alignClass = "img-left";
+                            style.Remove("float");
+                            style.Remove("margin-left");
+                            style.Remove("margin-right");
+                            style.Remove("margin-bottom");
+                            style.Remove("margin-top");
+                            break;
+                        case "right":
+                            alignClass = "img-right";
+                            style.Remove("float");
+                            style.Remove("margin-left");
+                            style.Remove("margin-right");
+                            style.Remove("margin-bottom");
+                            style.Remove("margin-top");
+                            break;
+                        default:
+                            alignClass = "";
+                            break;
+                    }
+
+                    foreach (var pair in style)
+                    {
+                        newStyle += pair.Key + ":" + pair.Value+";";
+                    }
+                    imgAttr["style"] = newStyle;
+                }
+            }
+
+            if (!String.IsNullOrEmpty(imgAttr["photographer"]))
+            {
+                htmlPhotographer = "(Foto: " + imgAttr["photographer"] + ")";
+            }
+                    
+                    
+            if (!String.IsNullOrEmpty(imgAttr["alt"]))
+            {
+                htmlLegend = "<span class=\"legend-photo\" style=\"max-width:" + imgAttr["width"] + "px;display: block;\">" + imgAttr["alt"] + " " + htmlPhotographer + " </span>";
+            }
+            else if (!String.IsNullOrEmpty(imgAttr["photographer"]))
+            {
+                htmlLegend = "<span class=\"legend-photo\" style=\"max-width:" + imgAttr["width"] + "px;display: block;\"> Foto: " + imgAttr["photographer"] + " </span>";
+            }
+
+
+
+            /*replace old html with wrap in img tag*/
+            string wrapper = @"<span class='"+alignClass+"' style='" + imgAttr["style"] + "' data-image-id='" + index.ToString() + "'><img alt=\"" + imgAttr["alt"] + "\" src=\"" +
+                                            Display.ResizeMediaUrl(Width: Convert.ToInt32(imgAttr["width"]), Height: Convert.ToInt32(imgAttr["height"]), Mode: "crop", Alignment: "middlecenter",
+                                                            Path: WebUtility.HtmlDecode(imgAttr["src"])) +
+                                        "\" style=\"display: block;\" >" + htmlLegend + "</span>";
+            string wrappedText = string.Format(wrapper, value);
+            html = html.Replace(value, wrappedText);
+
+            /*stores attr of img tag in list*/
+            listImage.Add(imgAttr);
+
+            index++;
+
+        }
+
+    }
+
+
+    @Html.Raw("<div class=\"clearfix body-part\">")
+        @Html.Raw(html)
+    @Html.Raw("</div>")
+
+}
+catch (System.Exception)
+{
+    @Html.Raw("<div class=\"clearfix body-part\">")
+        @Model.Html
+    @Html.Raw("</div>")
+}

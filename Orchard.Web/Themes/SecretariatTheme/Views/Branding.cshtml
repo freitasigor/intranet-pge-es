@@ -1,0 +1,49 @@
+﻿@using Orchard.Environment.Configuration
+@using System.IO;
+@using System.Text;
+@{
+
+    string LogomarcaSrc = WorkContext.Layout.LogomarcaSrc.ToString();
+    var siteName = WorkContext.Layout.SiteName.ToString();
+
+    string nameInstitute = WorkContext.Layout.NomeInstituicao.ToString();
+    string abbreviationInstitute = WorkContext.Layout.SiglaInstituicao.ToString();
+
+}
+<div class="text-center print">Governo do Estado do Espírito Santo</div>
+<div class="row sec-name-row">
+    <div class="span-12 col-xs-12 col-xs-offset-0 col-sm-9 col-sm-offset-3 col-md-12 col-md-offset-0 col-lg-12 col-lg-offset-0">
+        <a href="@Href("~/")" title="Ir para a Página Inicial">
+
+
+            @if (!String.IsNullOrEmpty(LogomarcaSrc))
+            {
+                <img class="logo logo-default logo-width" title="Ir para a Página Inicial" src="@Display.ResizeMediaUrl(Width: 195, Mode: "pad", Alignment: "middlecenter", Path: LogomarcaSrc)" alt="logomarca" />
+                <img class="logo-thumb" title="Ir para a Página Inicial" src="@Display.ResizeMediaUrl(Height: 50, Mode: "pad", Alignment: "middlecenter", Path: LogomarcaSrc)" alt="logomarca" />
+            }
+            else
+            {
+                <h1 class="branding">
+                    @if (!String.IsNullOrEmpty(abbreviationInstitute))
+                    {
+                        <strong>@abbreviationInstitute</strong>
+                    }
+                    else
+                    {
+                        <strong>@WorkContext.CurrentSite.SiteName</strong>
+                    }
+                </h1>
+            }
+
+            @if (!String.IsNullOrEmpty(siteName))
+            {
+                <div class="site-name-family-font-family name-sec name-site">@siteName</div>
+            }
+            else if (!String.IsNullOrEmpty(nameInstitute))
+            {
+                <div class="name-sec">@nameInstitute</div>
+            }
+
+        </a>
+    </div>
+</div>

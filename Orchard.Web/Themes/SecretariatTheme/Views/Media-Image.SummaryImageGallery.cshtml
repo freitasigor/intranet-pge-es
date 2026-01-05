@@ -1,0 +1,31 @@
+﻿@using Orchard.MediaLibrary.Models
+@using Orchard.Utility.Extensions;
+@{
+    MediaPart mediaPart = Model.ContentItem.MediaPart;
+    //Layout.Title = mediaPart.Title;
+    var contentTypeClassName = mediaPart.ContentItem.ContentType.HtmlClassify();
+
+    var caption = "";
+    var fotografo = "";
+    
+    
+}
+@if (!String.IsNullOrEmpty(Model.ContentItem.MediaPart.Caption))
+{
+    caption = Model.ContentItem.MediaPart.Caption;
+    try
+    {
+        if (!String.IsNullOrEmpty(Model.ContentItem.ImagePart.Fotografo.Value))
+        {
+            fotografo = "Foto: " + Model.ContentItem.ImagePart.Fotografo.Value;
+        }
+    }
+    catch (System.Exception) { }
+
+}
+
+<img src="@Display.ResizeMediaUrl(Width: 60, height: 45, Mode: "crop", Alignment: "middlecenter", Path: Model.ContentItem.MediaPart.MediaUrl)"
+     alt="@fotografo"
+     data-description="@caption"
+     data-large-src="@Display.ResizeMediaUrl(Width: 800, Mode: "max", Alignment: "middlecenter", Path: Model.ContentItem.MediaPart.MediaUrl)"
+     data-full-src="@Model.ContentItem.MediaPart.MediaUrl" />

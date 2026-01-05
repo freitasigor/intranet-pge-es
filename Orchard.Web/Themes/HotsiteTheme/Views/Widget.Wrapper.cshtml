@@ -1,0 +1,589 @@
+﻿@using Orchard.ContentManagement;
+@using Orchard.Widgets.Models;
+@{
+
+    var widgetPart = ((IContent)Model.ContentItem).As<WidgetPart>();
+    dynamic objContent = null;
+
+    string typeContent = Model.ContentItem.ContentType;
+
+
+    var backgroundColor = "";
+    var bgImageDefault = "";
+    var bgCustomColor = "";
+    var fontCustomColor = "";
+    var posicao_Btn = "col-lg-12";
+    bool fullwidth = false;
+    var columnWidth = "12";
+    var contentWrapperWidth = "";
+
+    bool isSlider = false;
+    var sliderId = "";
+    bool isBootstrapCarousel = true;
+    var quantItemSlider = 0;
+
+    var subTitle = "";
+
+    Dictionary<string, string> btnOne = new Dictionary<string, string>();
+    Dictionary<string, string> btnTwo = new Dictionary<string, string>();
+
+    Dictionary<string, string> objMap = new Dictionary<string, string>();
+
+    var tag = Tag(Model, "article");
+    tag.MergeAttribute("id", Model.ContentItem.WidgetPart.Name);
+    var classHeader = "row";
+
+
+
+    if (typeContent == "ParallaxWidget" || typeContent == "ParallaxWidgetProjection")
+    {
+
+        if (typeContent == "ParallaxWidget")
+        {
+            objContent = Model.ContentItem.ParallaxWidget;
+        }
+        else if (typeContent == "ParallaxWidgetProjection")
+        {
+            objContent = Model.ContentItem.ParallaxWidgetProjection;
+
+        }
+
+
+        if (!object.ReferenceEquals(null, objContent))
+        {
+
+
+            /*Subtitle*/
+            try
+            {
+                if (!String.IsNullOrEmpty(objContent.Subtitulo.Value))
+                {
+                    subTitle = objContent.Subtitulo.Value;
+
+                }
+
+            }
+            catch { }
+
+            /*Background color*/
+            try
+            {
+                if (!String.IsNullOrEmpty(objContent.Cordefundo.Value) && objContent.Cordefundo.Value.ToLower() != "nenhuma")
+                {
+                    if (objContent.Cordefundo.Value.ToLower() != "cinza"){
+                        tag.AddCssClass("bg-color");
+                    }
+                    tag.AddCssClass("bg-" + objContent.Cordefundo.Value.ToLower());
+
+                }
+
+            }
+            catch { }
+            /*Background Custom color*/
+            try
+            {
+                if (!String.IsNullOrEmpty(objContent.Cordefundopersonalizada.Value))
+                {
+                    bgCustomColor = ".bg-customColor-" + widgetPart.Id +"{ ";
+                    bgCustomColor += "background-color:" + objContent.Cordefundopersonalizada.Value + ";";
+                    bgCustomColor += "}";
+                    tag.AddCssClass("bg-customColor");
+                    tag.AddCssClass("bg-customColor-" + widgetPart.Id);
+                }
+
+            }
+            catch { }
+
+            /*Background image*/
+            try
+            {
+                if (!String.IsNullOrEmpty(objContent.ImagemdeFundo.FirstMediaUrl))
+                {
+                    bgImageDefault = ".bg-image-"+ widgetPart.Id +"{ ";
+                    bgImageDefault += "background:none;";
+                    bgImageDefault += "background-image: url(\"" + objContent.ImagemdeFundo.FirstMediaUrl + "\");";
+                    bgImageDefault += "background-size: cover;background-repeat: no-repeat;background-attachment: fixed;background-position: center;";
+                    bgImageDefault += "}";
+
+                    tag.AddCssClass("bg-image");
+                    tag.AddCssClass("bg-image-" + widgetPart.Id);
+                }
+
+            }
+            catch { }
+
+
+            /*Font Custom color*/
+            try
+            {
+                if (!String.IsNullOrEmpty(objContent.Cordafonte.Value))
+                {
+                    fontCustomColor = ".font-customColor .section-title,.font-customColor .section-subtitle{ ";
+                    fontCustomColor += "color:" + objContent.Cordafonte.Value + ";";
+                    fontCustomColor += "}";
+
+                    fontCustomColor += ".font-customColor .separator{ ";
+                    fontCustomColor += "background-color:" + objContent.Cordafonte.Value + ";";
+                    fontCustomColor += "}";
+
+                    fontCustomColor += ".font-customColor.bg-color .more-contents .btn,.font-customColor.bg-image .more-contents .btn{ ";
+                    fontCustomColor += "border-color:" + objContent.Cordafonte.Value + ";";
+                    fontCustomColor += "color:" + objContent.Cordafonte.Value + ";";
+                    fontCustomColor += "}";
+
+                    fontCustomColor += ".font-customColor.bg-color .more-contents .btn:hover, .font-customColor.bg-color .more-contents .btn:focus, .font-customColor.bg-color .more-contents .btn:active,";
+                    fontCustomColor += ".font-customColor.bg-image .more-contents .btn:hover, .font-customColor.bg-image .more-contents .btn:focus, .font-customColor.bg-image .more-contents .btn:active {";
+                    fontCustomColor += "border-color:#fff;";
+                    fontCustomColor += "color:#333;";
+                    fontCustomColor += "}";
+
+                    tag.AddCssClass("font-customColor");
+                }
+
+            }
+            catch { }
+
+            /*Mask*/
+            try
+            {
+                if (!String.IsNullOrEmpty(objContent.Mascaradefundo.Value) && objContent.Mascaradefundo.Value.ToLower() != "nenhuma")
+                {
+                    contentWrapperWidth = "mask-" + objContent.Mascaradefundo.Value.ToLower();
+                }
+            }
+            catch { }
+
+
+            /*Btn 1*/
+            try
+            {
+                if (!String.IsNullOrEmpty(objContent.Botao1.Text))
+                {
+                    btnOne.Add("text", "");
+                    btnOne.Add("target", "");
+                    btnOne.Add("value", "");
+
+                    btnOne["text"] = objContent.Botao1.Text;
+                    var target = (!String.IsNullOrEmpty(objContent.Botao1.Target)) ? objContent.Botao1.Target : "_self";
+                    btnOne["target"] = target;
+                    btnOne["value"] = objContent.Botao1.Value;
+
+                }
+                if (!String.IsNullOrEmpty(objContent.Botao2.Text))
+                {
+
+                    btnTwo.Add("text", "");
+                    btnTwo.Add("target", "");
+                    btnTwo.Add("value", "");
+
+                    btnTwo["text"] = objContent.Botao2.Text;
+                    var target = (!String.IsNullOrEmpty(objContent.Botao2.Target)) ? objContent.Botao2.Target : "_self";
+                    btnTwo["target"] = target;
+                    btnTwo["value"] = objContent.Botao2.Value;
+
+                }
+            }
+            catch { }
+
+
+            /*Button Position*/
+            try
+            {
+                if (!String.IsNullOrEmpty(objContent.PosicaoBotoes.Value))
+                {
+                    string position = objContent.PosicaoBotoes.Value.ToLower();
+                    switch (position)
+                    {
+                        case "direita":
+                            posicao_Btn = "col-lg-6 col-lg-offset-6";
+                            break;
+                        case "esquerda":
+                            posicao_Btn = "col-lg-6";
+                            break;
+                        default:
+                            posicao_Btn = "col-lg-12";
+                            break;
+                    }
+                }
+            }
+            catch { }
+
+
+            /*Fullwidth*/
+            try
+            {
+                if (objContent.fullwidth.Value != null)
+                {
+                    fullwidth = objContent.fullwidth.Value;
+
+                }
+
+            }
+            catch { }
+
+
+        }
+
+
+    }
+    else if(typeContent == "MapsWidget")
+    {
+
+        objContent = Model.ContentItem.MapsWidget;
+
+
+        objMap.Add("nome", "");
+        objMap.Add("endereco", "");
+        objMap.Add("bairro", "");
+        objMap.Add("cidade", "");
+        objMap.Add("uf", "");
+        objMap.Add("cep", "");
+        objMap.Add("tel", "");
+        objMap.Add("email", "");
+        objMap.Add("latitude", "");
+        objMap.Add("longitude", "");
+
+
+        /*Nome*/
+        try
+        {
+            if (!String.IsNullOrEmpty(objContent.NomedoLocal.Value))
+            {
+                objMap["nome"] = objContent.NomedoLocal.Value;
+            }
+
+        }
+        catch { }
+
+
+        /*Endereco*/
+        try
+        {
+            if (!String.IsNullOrEmpty(objContent.Endereco.Value))
+            {
+                objMap["endereco"] = objContent.Endereco.Value;
+            }
+
+        }
+        catch { }
+
+        /*Bairro*/
+        try
+        {
+            if (!String.IsNullOrEmpty(objContent.Bairro.Value))
+            {
+                objMap["bairro"] = objContent.Bairro.Value;
+            }
+
+        }
+        catch { }
+
+        /*Cidade*/
+        try
+        {
+            if (!String.IsNullOrEmpty(objContent.Cidade.Value))
+            {
+                objMap["cidade"] = objContent.Cidade.Value;
+            }
+
+        }
+        catch { }
+
+        /*UF*/
+        try
+        {
+            if (!String.IsNullOrEmpty(objContent.UF.Value))
+            {
+                objMap["uf"] = objContent.UF.Value;
+            }
+
+        }
+        catch { }
+
+        /*CEP*/
+        try
+        {
+            if (!String.IsNullOrEmpty(objContent.CEP.Value))
+            {
+                objMap["cep"] = objContent.CEP.Value;
+            }
+
+        }
+        catch { }
+
+        /*Telefone*/
+        try
+        {
+            if (!String.IsNullOrEmpty(objContent.Telefone.Value))
+            {
+                objMap["tel"] = objContent.Telefone.Value;
+            }
+
+        }
+        catch { }
+
+        /*Email*/
+        try
+        {
+            if (!String.IsNullOrEmpty(objContent.Email.Value))
+            {
+                objMap["email"] = objContent.Email.Value;
+            }
+
+        }
+        catch { }
+
+
+        /*Latitude*/
+        try
+        {
+            if (!String.IsNullOrEmpty(objContent.Latitude.Value))
+            {
+                objMap["latitude"] = objContent.Latitude.Value;
+            }
+
+        }
+        catch { }
+
+        /*Longitude*/
+        try
+        {
+            if (!String.IsNullOrEmpty(objContent.Longitude.Value))
+            {
+                objMap["longitude"] = objContent.Longitude.Value;
+            }
+
+        }
+        catch { }
+
+    }
+    else
+    {
+        try
+        {
+            if (Model.ContentItem.BackgroundColorPart.BackgroundColor.Value.ToLower() != "nenhuma")
+            {
+                backgroundColor = "bg-color-element bg-color-" + Model.ContentItem.BackgroundColorPart.BackgroundColor.Value.ToLower();
+            }
+        }
+        catch { }
+
+        try
+        {
+            columnWidth = Model.ContentItem.ColumnWidthPart.ColumnWidth.Value;
+        }
+        catch { }
+
+
+        tag.AddCssClass("col-xs-12 col-sm-" + columnWidth + " col-md-" + columnWidth + " col-lg-" + columnWidth);
+
+        if (!String.IsNullOrEmpty(backgroundColor))
+        {
+            //tag.AddCssClass(backgroundColor);
+            contentWrapperWidth = "col-xs-12 col-sm-12 col-md-12 col-lg-12";
+        }
+
+        foreach (var item in Model.Content.Items)
+        {
+            if (item.Classes.Count > 0)
+            {
+                if (item.Classes.Contains("slider"))/*is slider*/
+                {
+                    isSlider = true;
+                    sliderId = item.Id;
+                    IEnumerable<Orchard.ContentManagement.ContentItem> contentItens = item.ContentItems;
+                    quantItemSlider = contentItens.Count();
+
+                    if (quantItemSlider == 1)
+                    {
+                        if (contentItens.First().ContentType == "GrupodeVideos") { quantItemSlider = 2; }
+                    }
+                }
+                if (item.Classes.Contains("rp-carousel"))/*not bootstrap carousel*/
+                {
+                    isBootstrapCarousel = false;
+                }
+            }
+
+        }
+
+    }
+
+
+
+}
+
+
+<style> 
+    @Html.Raw(bgImageDefault)
+    @Html.Raw(bgCustomColor)
+    @Html.Raw(fontCustomColor)
+</style>
+
+@tag.StartElement
+
+    @if (typeContent == "ParallaxWidget" || typeContent == "ParallaxWidgetProjection")//is ParallaxWidget
+    {
+
+        <div class="@contentWrapperWidth content-wrapper">
+
+            <div class="@((fullwidth)? "container-fluid" : "container section-content")">
+                @if ((widgetPart.RenderTitle && HasText(widgetPart.Title)))
+                {
+
+                    <div class="row section-header wow fadeIn  animated animated">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">
+
+                                <h1 class="section-title">@widgetPart.Title</h1>
+                        
+                            @if (!String.IsNullOrEmpty(subTitle))
+                            {
+                                <div class="section-subtitle">
+                                    @subTitle
+                                </div>
+                            }
+                            <div class="color-secondary-background-color separator text-center"></div>
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    <div class="@((fullwidth)? "" : "span12 col-xs-12 col-sm-12 col-md-12 col-lg-12")">
+                        <div class="@((fullwidth)? "" : "container")">
+                            @Display(Model.Child)
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row section-header wow fadeInUp  animated">
+                    <div class="col-xs-12 col-sm-12 col-md-12 @posicao_Btn text-center">
+                        @if (btnOne.ContainsKey("text") && !String.IsNullOrEmpty(btnOne["text"]))
+                        {
+                            <div class="background-primary-button-background-color primary-button-border-border-color font-color-primary-button-color recent-read-more more-contents">
+                                <a target="@btnOne["target"]" href="@btnOne["value"]" title="@btnOne["text"]" class="btn btn-primary btn-md background-primary-button-background-color primary-button-border-border-color font-color-primary-button-color">@btnOne["text"]</a>
+                            </div>
+                        }
+                        @if (btnTwo.ContainsKey("text") && !String.IsNullOrEmpty(btnTwo["text"]))
+                        {
+                            <div class="background-primary-button-background-color primary-button-border-border-color font-color-primary-button-color recent-read-more more-contents">
+                                <a target="@btnTwo["target"]" href="@btnTwo["value"]" title="@btnTwo["text"]" class="btn btn-primary btn-md background-primary-button-background-color primary-button-border-border-color font-color-primary-button-color">@btnTwo["text"]</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @if (Model.Footer != null)
+                {
+                    <footer>
+                        @Display(Model.Footer)
+                    </footer>
+                }
+            </div>
+
+        </div>
+
+    }
+    else if (typeContent == "MapsWidget")
+    {
+
+        <!-- Google Maps -->
+        <div id="map-@Model.ContentItem.Id" class="google-map" data-nome="@objMap["nome"]" data-endereco="@objMap["endereco"]" data-bairro="@objMap["bairro"]" data-cidade="@objMap["cidade"]" data-uf="@objMap["uf"]" data-cep="@objMap["cep"]" data-tel="@objMap["tel"]" data-email="@objMap["email"]" data-lat="@objMap["latitude"]" data-lng="@objMap["longitude"]" ></div>
+    }
+    else//not is
+    {
+
+
+        <div class="@contentWrapperWidth content-wrapper @backgroundColor">
+
+            @if ((widgetPart.RenderTitle && HasText(widgetPart.Title)) || Model.Header != null)
+            {
+                <header class="@classHeader content-header">
+
+                    @if (isSlider && quantItemSlider > 1)
+                    {
+
+                        <div class="span8 col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                            @if ((widgetPart.RenderTitle && HasText(widgetPart.Title)))
+                            {
+                                <div class="content-title">
+                                    <h3>
+                                        <strong>@widgetPart.Title</strong>
+                                    </h3>
+                                    <div class="bar"></div>
+                                </div>
+                            }
+                        </div>
+                        <div class="span4 col-xs-4 col-sm-4 col-md-4 col-lg-4">
+
+                            <div id="NAV-ID-@(Model.ContentItem.Id)" class="crsl-nav carousel-nav">
+                                <!-- Controls -->
+                                <a class="left previous" title="Anterior" href="#carousel-@sliderId" @if (isBootstrapCarousel) { @Html.Raw("role='button' data-slide='prev'")   }>
+                                    <i class="fa fa-chevron-left"></i>
+
+                                </a>
+                                <a class="right next" title="Próximo" href="#carousel-@sliderId" @if (isBootstrapCarousel) { @Html.Raw("role='button' data-slide='next'")   }>
+                                    <i class="fa fa-chevron-right"></i>
+                                </a>
+                            </div>
+
+                        </div>
+
+
+                    }
+                    else
+                    {
+
+                        <div class="span12 col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            @if ((widgetPart.RenderTitle && HasText(widgetPart.Title)))
+                            {
+                                <div class="content-title">
+                                    <h3><strong>@widgetPart.Title</strong></h3>
+                                    <div class="bar"></div>
+                                </div>
+                            }
+                        </div>
+
+                    }
+
+                    @Display(Model.Header)
+                </header>
+
+            }
+            else if (isSlider && quantItemSlider > 1)
+            {
+                <header class="@classHeader content-header">
+                    <div class="span12 col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div id="NAV-ID-@(Model.ContentItem.Id)" class="crsl-nav carousel-nav">
+                            <!-- Controls -->
+                            <a class="left previous" title="Anterior" href="#carousel-@sliderId" role="button" data-slide="prev">
+                                <i class="fa fa-chevron-left"></i>
+
+                            </a>
+                            <a class="right next" title="Próximo" href="#carousel-@sliderId" role="button" data-slide="next">
+                                <i class="fa fa-chevron-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </header>
+            }
+
+
+            <div class="row">
+                <div class="span12 col-xs-12 col-sm-12 col-md-12 col-lg-12">                   
+                        @Display(Model.Child)                   
+                </div>
+            </div>
+
+            @if (Model.Footer != null)
+            {
+                <footer>
+                    @Display(Model.Footer)
+                </footer>
+            }
+
+        </div>
+
+
+    }
+    
+@tag.EndElement

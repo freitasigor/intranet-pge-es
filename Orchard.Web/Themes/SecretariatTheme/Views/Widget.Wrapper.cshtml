@@ -1,0 +1,161 @@
+﻿@using Orchard.ContentManagement;
+@using Orchard.Widgets.Models;
+@{
+    var widgetPart = ((IContent)Model.ContentItem).As<WidgetPart>();
+
+    var backgroundColor = "";
+    var columnWidth = "12";
+    var contentWrapperWidth = "";
+
+    try
+    {
+        if (Model.ContentItem.BackgroundColorPart.BackgroundColor.Value.ToLower() != "nenhuma")
+        {
+            backgroundColor = "bg-color-element bg-color-" + Model.ContentItem.BackgroundColorPart.BackgroundColor.Value.ToLower();
+        }
+    }
+    catch { }
+
+    try
+    {
+        columnWidth = Model.ContentItem.ColumnWidthPart.ColumnWidth.Value;
+    }
+    catch { }
+
+    var tag = Tag(Model, "article");
+    tag.AddCssClass("col-xs-12 col-sm-" + columnWidth + " col-md-" + columnWidth + " col-lg-" + columnWidth);
+
+    if (!String.IsNullOrEmpty(backgroundColor))
+    {
+        //tag.AddCssClass(backgroundColor);
+        contentWrapperWidth = "col-xs-12 col-sm-12 col-md-12 col-lg-12";
+    }
+
+
+    bool isSlider = false;
+    var sliderId = "";
+    bool isBootstrapCarousel = true;
+    var quantItemSlider = 0;
+    foreach (var item in Model.Content.Items)
+    {
+        if (item.Classes.Count > 0)
+        {
+            if (item.Classes.Contains("slider"))/*is slider*/
+            {
+                isSlider = true;
+                sliderId = item.Id;
+                IEnumerable<Orchard.ContentManagement.ContentItem> contentItens = item.ContentItems;
+                quantItemSlider = contentItens.Count();
+
+                if(quantItemSlider == 1)
+                {
+                    if(contentItens.First().ContentType == "GrupodeVideos") { quantItemSlider = 2;}
+                }
+            }
+            if (item.Classes.Contains("rp-carousel"))/*not bootstrap carousel*/
+            {
+                isBootstrapCarousel = false;
+            }
+        }
+
+    }
+
+    var classHeader = "row";
+
+}
+
+@tag.StartElement
+
+    <div class="@contentWrapperWidth content-wrapper @backgroundColor">
+
+    @if ((widgetPart.RenderTitle && HasText(widgetPart.Title)) || Model.Header != null)
+    {
+        <header class="@classHeader content-header">
+
+            @if (isSlider && quantItemSlider > 1)
+            {
+
+                <div class="span8 col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                    @if ((widgetPart.RenderTitle && HasText(widgetPart.Title)))
+                    {
+                        <div class="content-title">
+                            <h3>
+                                <strong>@widgetPart.Title</strong>
+                            </h3>
+                            <div class="bar"></div>
+                        </div>
+                    }
+                </div>
+                <div class="span4 col-xs-4 col-sm-4 col-md-4 col-lg-4">
+
+                    <div id="NAV-ID-@(Model.ContentItem.Id)" class="crsl-nav carousel-nav">
+                        <!-- Controls -->
+                        <a class="left previous" title="Anterior" href="#carousel-@sliderId" @if (isBootstrapCarousel) { @Html.Raw("role='button' data-slide='prev'")  }>
+                            <i class="fa fa-chevron-left"></i>
+
+                        </a>
+                        <a class="right next" title="Próximo" href="#carousel-@sliderId" @if (isBootstrapCarousel) { @Html.Raw("role='button' data-slide='next'")  }>
+                            <i class="fa fa-chevron-right"></i>
+                        </a>
+                    </div>
+
+                </div>
+
+
+            }
+            else
+            {
+
+                <div class="span12 col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    @if ((widgetPart.RenderTitle && HasText(widgetPart.Title)))
+                    {
+                        <div class="content-title">
+                            <h3><strong>@widgetPart.Title</strong></h3>
+                            <div class="bar"></div>
+                        </div>
+                    }
+                </div>
+
+            }
+
+            @Display(Model.Header)
+        </header>
+
+    }
+    else if (isSlider && quantItemSlider > 1)
+    {
+        <header class="@classHeader content-header">
+            <div class="span12 col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div id="NAV-ID-@(Model.ContentItem.Id)" class="crsl-nav carousel-nav">
+                    <!-- Controls -->
+                    <a class="left previous" title="Anterior" href="#carousel-@sliderId" role="button" data-slide="prev">
+                        <i class="fa fa-chevron-left"></i>
+
+                    </a>
+                    <a class="right next" title="Próximo" href="#carousel-@sliderId" role="button" data-slide="next">
+                        <i class="fa fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+        </header>
+    }
+
+
+    <div class="row">
+        <div class="span12 col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            @Display(Model.Child)
+        </div>
+    </div>
+
+    @if (Model.Footer != null)
+    {
+        <footer>
+            @Display(Model.Footer)
+        </footer>
+    }
+
+</div>
+
+
+    
+@tag.EndElement

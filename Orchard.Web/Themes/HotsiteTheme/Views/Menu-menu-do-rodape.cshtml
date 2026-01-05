@@ -1,0 +1,35 @@
+﻿@{
+    // Model is Model.Menu from the layout (Layout.Menu)
+    var tag = Tag(Model, "div");
+
+    var items = (IList<dynamic>)Enumerable.Cast<dynamic>(Model.Items);
+
+    if (items.Any()) {
+        items[0].Classes.Add("first");
+        items[items.Count - 1].Classes.Add("last");
+    }
+
+    tag.AddCssClass("row footer-menu");
+
+    var columnSize = 12;
+    if (items.Count > 0)
+    {
+        columnSize = columnSize / items.Count;
+    }
+
+}
+
+@tag.StartElement
+    @for (int i = 0; i <= items.Count - 1; i++)
+    {
+        
+        <div class="col-xs-12 col-sm-@columnSize col-md-@columnSize col-lg-@columnSize">
+            <ul class="container-items-menu">
+                @DisplayChildren(items[i])
+            </ul>
+        </div>
+    }
+    @* see MenuItem shape template *@
+    @*@DisplayChildren(Model)*@
+@tag.EndElement
+

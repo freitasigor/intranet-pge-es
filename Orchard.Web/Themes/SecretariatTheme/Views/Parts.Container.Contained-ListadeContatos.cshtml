@@ -1,0 +1,155 @@
+﻿@using Orchard.Utility.Extensions;
+@{
+    var contentTypeClassName = ((string)Model.ContentItem.ContentType).HtmlClassify();
+    Model.List.Classes.Add(contentTypeClassName);
+    Model.List.Classes.Add("panel-group panel-group-downloads");
+    Model.List.ItemClasses.Add("panel");
+    Model.List.Attributes.Add("id", "accordion-" + contentTypeClassName);
+
+    var expanded = "false";
+    var collapseClass = "";
+    var panelClass = "";
+    var iconPanel = "";
+    try
+    {
+        int qtdContents = Model.ContentItem.ContainerPart.ItemCount;
+        if (qtdContents == 1)
+        {
+            expanded = "true";
+            collapseClass = "in";
+            panelClass = "painel-ativo active";
+            iconPanel = "fa-minus";
+        }
+    }
+    catch (System.Exception ex) { }
+
+    var tituloAnterior = "";
+    var agrupando = false;
+    var agruparPorTitulo = false;
+    try
+    {
+        agruparPorTitulo = Model.ContentItem.ListadeContatos.AgruparporTitulo.Value;
+    }
+    catch
+    {
+        agruparPorTitulo = false;
+    }
+}
+
+@if (!agruparPorTitulo)
+{
+    <div class="row">
+        <div class="span-12 col-lg-12">
+            @Display(Model.List)
+            @Display(Model.Pager)
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="span-12 col-lg-12">
+            <ul class="panel-group panel-group-downloads listade-contatos list-items content-items" id="accordion-listade-contatos" >
+                @foreach (var item in Model.List.Items)
+                {
+                    var tituloAtual = item.ContentItem.TitlePart.Title.ToString();
+                    var abre = false;
+                    var fecha = false;
+                    
+                    if (tituloAnterior != "")
+                    {
+                        if (tituloAnterior == tituloAtual)
+                        {
+                            agrupando = true;
+                            fecha = false;
+                            abre = false;
+                        }
+                        else
+                        {
+                            agrupando = false;
+                            fecha = true;
+                            abre = true;
+                        }
+                    }
+                    else
+                    {
+                        fecha = false;
+                        abre = true;
+                    }
+                    tituloAnterior = tituloAtual;
+
+                    if (fecha)
+                    {
+                                @: </div><!-- panel-body -->
+                            @: </div><!-- panel-collapse -->
+                        @: </li>
+                    }
+                    if (abre)
+                    {
+                        @:<li class="first panel">
+
+                        @:    <div class="panel-heading @panelClass" role="tab" id="heading-@item.ContentItem.Id">
+                        @:        <a class="" data-toggle="collapse" href="#collapse-@item.ContentItem.Id" aria-expanded="@expanded" aria-controls="collapse-@item.ContentItem.Id">
+                        @:            <h4 class="panel-title">
+                                        if (!String.IsNullOrEmpty(item.ContentItem.TitlePart.Title.ToString()))
+                                        {
+                                            @: @item.ContentItem.TitlePart.Title.ToString()
+                                        }
+                        @:                <i class="fa fa-plus @iconPanel"></i>
+                        @:            </h4>
+                        @:            <span class="bottom-triangle active"></span>
+                        @:        </a>
+                        @:    </div>
+
+                        @:    <div id="collapse-@item.ContentItem.Id" class="panel-collapse collapse @collapseClass" role="tabpanel" aria-labelledby="heading-@item.ContentItem.Id">
+                        @:        <div class="panel-body">
+                    }
+                    
+                    if (agrupando)
+                    {
+                        @: <div class="span-12 col-lg-12"><hr class="divisor-list-item" /></div>
+                    }
+                    <div class="span-12 col-lg-12 column-contato">
+                        @try
+                        {
+                            if (item.ContentItem.Contato.Fields.Count > 0)
+                            {
+                                var descricaoTitular = "Titular";
+                                foreach (var infoContato in item.ContentItem.Contato.Fields)
+                                {
+                                    if (infoContato.Name == "NovaDescricaoparacampoTitular" && !String.IsNullOrEmpty(infoContato.Value))
+                                    {
+                                        descricaoTitular = infoContato.Value;
+                                    }
+                                }
+                                foreach (var infoContato in item.ContentItem.Contato.Fields)
+                                {
+                                    if (!String.IsNullOrEmpty(infoContato.Value))
+                                    {
+                                        if (infoContato.Name == "Titular")
+                                        {
+                                            <div class="info-contato">
+                                                <strong class="info-title">@descricaoTitular<span>:</span></strong>
+                                                <div class="info-value">@infoContato.Value</div>
+                                            </div>
+                                        }
+                                        else if (!String.IsNullOrEmpty(infoContato.Value) && infoContato.Name != "NovaDescricaoparacampoTitular")
+                                        {
+                                            <div class="info-contato">
+                                                <strong class="info-title">@infoContato.DisplayName<span>:</span></strong>
+                                                <div class="info-value">@infoContato.Value</div>
+                                            </div>
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                        catch (System.Exception ex) { }
+                    </div>
+
+                }
+                </ul>
+            </div>
+        </div>
+}

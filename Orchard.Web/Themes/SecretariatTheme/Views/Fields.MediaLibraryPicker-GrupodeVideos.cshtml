@@ -1,0 +1,109 @@
+﻿@using Orchard.ContentManagement
+@using Orchard.MediaLibrary.Fields
+@using Orchard.Utility.Extensions;
+@using System.Linq;
+
+@{
+    var field = (MediaLibraryPickerField) Model.ContentField;
+    string name = field.DisplayName;
+    var contents = field.MediaParts;
+    var contentsVideos = Model.ContentItem.GrupodeVideos.Videos.MediaParts;
+}
+
+@if (field.Name == "Videos")
+{
+    try
+    {
+        if (!String.IsNullOrEmpty(Model.ContentItem.GrupodeVideos.Descricao.Value))
+        {
+            <div class="row content-body">
+                <div class="col-lg-12">
+                    @Html.Raw(Model.ContentItem.GrupodeVideos.Descricao.Value)
+                    <hr class="album-separator" />
+                </div>
+            </div>
+        }
+    }
+    catch (System.Exception ex) { }
+
+    <section class="gallery row album-gallery media-library-picker-field media-library-picker-field-@name.HtmlClassify()" id="album-list-items-@Model.ContentItem.Id">
+        <div class="col-lg-12">
+            <div class="row video-line">
+                @try
+                {
+                    var indexVideos = 0;
+                    foreach (var content in contentsVideos)
+                    {
+
+                        var oembed = content.ContentItem.OEmbedPart;
+                        string thumbnail = "";
+                        thumbnail = oembed["thumbnail_url"] ?? oembed["thumbnail"];
+                        var bgImageDefault = "background-image: url(\"" + Display.ResizeMediaUrl(Width: 196, height: 110, Mode: "crop", Alignment: "middlecenter", Path: thumbnail) + "\");";
+                        if (indexVideos > 0 && indexVideos % 4 == 0)
+                        {
+                            @Html.Raw("</div>")
+                            @Html.Raw("<div class=\"row video-line \">")
+                        }
+                        <div class="span-3 col-xs-12 col-sm-5 col-md-4 col-lg-3 video-col">
+                            <a id="video-item-@indexVideos" class="thumbnail album-image-item video-item" rel="prettyVideo[gallery2]" href="@content.ContentItem.OEmbedPart.Source" title="@content.ContentItem.MediaPart.Title">
+                                <span class="album-image-thumb video-image-thumb" style="@bgImageDefault">
+                                    <i class="fa fa-play video-play"></i>
+                                </span>
+                            </a>
+                            <div class="caption video-caption ">
+                                <div class="video-date">
+                                    <strong>
+                                        @if (!((DateTime?)content.ContentItem.CommonPart.PublishedUtc).HasValue)
+                                        {
+                                            @T("Rascunho");
+                                        }
+                                        else
+                                        {
+                                            @Display.DateTime(DateTimeUtc: content.ContentItem.CommonPart.CreatedUtc, CustomFormat: T("dd/MM/yyyy - HH:mm"));<span>h</span>
+                                        }
+                                    </strong>
+                                </div>
+                                <h5 class="video-title">
+                                    <a href="javascript:void(0);" onclick="document.getElementById('video-item-@indexVideos').click();" title="@content.ContentItem.MediaPart.Title">
+                                        @content.ContentItem.MediaPart.Title
+                                    </a>
+
+                                </h5>
+
+                                @if (!String.IsNullOrEmpty(content.ContentItem.MediaPart.Caption))
+                                {
+                                    string excerptHtml = content.ContentItem.MediaPart.Caption;
+                                    var excerpt = new HtmlString(Html.Excerpt(excerptHtml, 200).ToString().Replace(Environment.NewLine, "</p>" + Environment.NewLine + "<p>"));
+                                    @excerpt
+                                }
+                                else if (!String.IsNullOrEmpty(oembed["description"]))
+                                {
+                                    string excerptEmbedHtml = oembed["description"];
+                                    var excerptEmbed = new HtmlString(Html.Excerpt(excerptEmbedHtml, 200).ToString().Replace(Environment.NewLine, "</p>" + Environment.NewLine + "<p>"));
+                                    @excerptEmbed
+                                }
+
+
+                            </div>
+
+                        </div>
+                                indexVideos++;
+                    }
+                }
+                catch (System.Exception ex) { }
+            </div>
+        </div>
+    </section>
+    <div class="row"><div class="span-12 col-lg-12"><ul data-container="album-list-items-@Model.ContentItem.Id" class="pager album-pagination"></ul></div></div>
+}
+else
+{
+    <section class="media-library-picker-field media-library-picker-field-@name.HtmlClassify()">
+        <h3>@name</h3>
+        @foreach(var content in contents) {
+        <div>
+            @Display(BuildDisplay(content, "Summary"))
+        </div>
+        }
+    </section>
+}

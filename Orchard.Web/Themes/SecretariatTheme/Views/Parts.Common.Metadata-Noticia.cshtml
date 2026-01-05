@@ -1,0 +1,21 @@
+﻿<div class="row content-header">
+    <div class="col-lg-12">
+        <div class="published">
+            @if (!((DateTime?)Model.ContentPart.PublishedUtc).HasValue)
+            {
+                @T("Rascunho");
+            }
+            else if (Model.ContentPart.PublishedUtc.ToString("dd/MM/yyyy HH:mm") != Model.ContentPart.CreatedUtc.ToString("dd/MM/yyyy HH:mm"))
+            {
+
+                @Display.DateTime(DateTimeUtc: Model.ContentPart.CreatedUtc, CustomFormat: T("dd/MM/yyyy HH'h'mm"));
+                <span> - Atualizado em </span>
+                @Display.DateTime(DateTimeUtc: Model.ContentPart.PublishedUtc, CustomFormat: T("dd/MM/yyyy HH'h'mm"));
+            }
+            else
+            {
+                @Display.DateTime(DateTimeUtc: Model.ContentPart.CreatedUtc, CustomFormat: T("dd/MM/yyyy HH'h'mm"));
+            }
+        </div>
+    </div>
+</div>

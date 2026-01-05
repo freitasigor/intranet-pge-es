@@ -1,0 +1,81 @@
+﻿@using Orchard.ContentManagement;
+@using Orchard.Utility.Extensions;
+@{
+    if (Model.Title != null) {
+        Layout.Title = Model.Title;
+    }
+
+    var contentTypeClassName = ((string)Model.ContentItem.ContentType).HtmlClassify();
+    Model.Classes.Add(contentTypeClassName);
+    Model.Classes.Add("content-item");
+    
+    Orchard.ContentManagement.ContentItem contentItem = Model.ContentItem;    
+    
+}
+
+<div class="album-item">
+    <div class="thumbnail effect-6">
+        <div class="img">
+
+            @if (!String.IsNullOrEmpty(Model.ContentItem.Album.ImagemdeCapa.FirstMediaUrl))
+            {
+                foreach (var content in Model.ContentItem.Album.ImagemdeCapa.MediaParts)
+                {
+                    @Display(Model.ContentItem.ContentManager.BuildDisplay(content, "SummaryImagemdeDestaqueGallery"))
+                }
+            }
+            else if (!String.IsNullOrEmpty(Model.ContentItem.Album.Imagens.FirstMediaUrl))
+            {    
+                @Display(Model.ContentItem.ContentManager.BuildDisplay(Model.ContentItem.Album.Imagens.MediaParts[0], "SummaryImagemdeDestaqueGallery"))
+            }
+
+            <div class="overlay" onclick="location.href='@Url.ItemDisplayUrl(contentItem)'">
+                <a href="@Url.ItemDisplayUrl(contentItem)" class="mybutton expand" title="Ver Fotos">Ver Fotos</a>
+                <a class="close-overlay hidden">x</a>
+            </div>
+
+        </div>
+    </div>
+    <div class="content-album">
+        <div class="date-album">
+            @if (!((DateTime?)Model.ContentItem.CommonPart.PublishedUtc).HasValue)
+            {
+                @T("Rascunho");
+            }
+            else
+            {
+                @Display.DateTime(DateTimeUtc: Model.ContentItem.CommonPart.CreatedUtc, CustomFormat: T("dd/MM/yyyy"));
+            }
+        </div>
+
+        <h4 class="title-album">
+            <a class="link-album" href="@Url.ItemDisplayUrl(contentItem)" title="Ver Fotos">
+                @if (!String.IsNullOrEmpty(Model.ContentItem.TitlePart.Title.ToString()))
+                {
+                    @Model.ContentItem.TitlePart.Title.ToString()
+                }
+            </a>
+        </h4>
+
+        @try
+        {
+            if (!String.IsNullOrEmpty(Model.ContentItem.Album.Descricao.Value))
+            {
+                string excerptHtml = Model.ContentItem.Album.Descricao.Value;
+                var excerpt = new HtmlString(Html.Excerpt(excerptHtml, 200).ToString().Replace(Environment.NewLine, "</p>" + Environment.NewLine + "<p>"));
+                <div class="excerpt-album">@excerpt</div>
+
+            }
+        }
+        catch (System.Exception ex) { }
+        <div class="link-color-color leia-mais">
+            <a href="@Url.ItemDisplayUrl(contentItem)" title="Ver Fotos" class="link-color-color leia-mais-link">
+                <span class="link-color-color">Ver Fotos</span><i class="ion-ios-arrow-right"></i>
+            </a>
+        </div> 
+    </div>
+
+</div>
+
+
+

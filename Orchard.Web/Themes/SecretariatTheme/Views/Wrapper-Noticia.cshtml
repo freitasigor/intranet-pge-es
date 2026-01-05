@@ -1,0 +1,199 @@
+﻿@using Orchard.ContentManagement
+@using Orchard.Mvc.Extensions
+@using Orchard.Mvc.Html;
+@using Orchard.UI.Resources;
+@using System.Text.RegularExpressions;
+@using System;
+@using System.Text;
+
+@{
+
+@functions{
+    // This function converts HTML code to plain text
+    public string HTMLToText(string HTMLCode)
+    {
+        // Remove new lines since they are not visible in HTML
+        HTMLCode = HTMLCode.Replace("\n", " ");
+
+        // Remove tab spaces
+        HTMLCode = HTMLCode.Replace("\t", " ");
+
+        // Remove multiple white spaces from HTML
+        HTMLCode = Regex.Replace(HTMLCode, "\\s+", " ");
+
+        // Remove HEAD tag
+        HTMLCode = Regex.Replace(HTMLCode, "<head.*?</head>", ""
+                            , RegexOptions.IgnoreCase | RegexOptions.Singleline);
+
+        // Remove any JavaScript
+        HTMLCode = Regex.Replace(HTMLCode, "<script.*?</script>", ""
+          , RegexOptions.IgnoreCase | RegexOptions.Singleline);
+
+        // Replace special characters like &, <, >, " etc.
+        StringBuilder sbHTML = new StringBuilder(HTMLCode);
+        // Note: There are many more special characters, these are just
+        // most common. You can add new characters in this arrays if needed
+        string[] OldWords = {"&nbsp;", "&amp;", "&quot;", "&lt;",
+       "&gt;", "&reg;", "&copy;", "&bull;", "&trade;","&#160;","&#8230;", "&Aacute;", "&aacute;", "&Acirc;","&acirc;", "&Agrave;", "&agrave;","&Atilde;","&atilde;","&Eacute;", "&eacute;", "&Ecirc;","&ecirc;", "&Egrave;", "&egrave;","&Iacute;", "&iacute;", "&Icirc;","&icirc;", "&Igrave;", "&igrave;", "&Oacute;", "&oacute;", "&Ocirc;","&ocirc;", "&Ograve;", "&ograve;","&Otilde;","&otilde;","&Uacute;", "&uacute;", "&Ucirc;","&ucirc;", "&Ugrave;", "&ugrave;","&Ccedil;", "&ccedil;"};
+        string[] NewWords = { " ", "&", "\"", "<", ">", "Â®", "Â©", "â€¢", "â„¢", " ", "...", "Á", "á", "Â", "â", "À", "à", "Ã", "ã", "É", "é", "Ê", "ê", "È", "è", "Í", "í", "Î", "î", "Ì", "ì", "Ó", "ó", "Ô", "ô", "Ò", "ò", "Õ", "õ", "Ú", "ú", "Û", "û", "Ù", "ù","Ç", "ç" };
+        for (int i = 0; i < OldWords.Length; i++)
+        {
+            sbHTML.Replace(OldWords[i], NewWords[i]);
+        }
+
+        // Check if there are line breaks (<br>) or paragraph (<p>)
+        sbHTML.Replace("<br>", "\n<br>");
+        sbHTML.Replace("<br ", "\n<br ");
+        sbHTML.Replace("<p ", "\n<p ");
+
+        // Finally, remove all HTML tags and return plain text
+        return System.Text.RegularExpressions.Regex.Replace(
+          sbHTML.ToString(), "<[^>]*>", "");
+    }
+}
+
+
+
+    string titleContent = Model.Title.ToString();
+    var urlContent = Url.MakeAbsolute(Url.ItemDisplayUrl((IContent)Model.ContentItem));
+
+    string descriptionContent = "";
+    var urlImage = "";
+    string siteName = Convert.ToString(WorkContext.CurrentSite.SiteName);
+    string author= "";
+
+    if(!String.IsNullOrEmpty(Model.ContentItem.CommonPart.OwnerField.Value.UserName))
+    {
+        author = Model.ContentItem.CommonPart.OwnerField.Value.UserName;
+        author = author.ToUpper();
+        author = author.Replace(".", " ");
+
+    }
+
+
+    try
+    {
+        if (!String.IsNullOrEmpty(Model.ContentItem.ResumoPart.Resumo.Value.ToString()))
+        {
+            descriptionContent = Model.ContentItem.ResumoPart.Resumo.Value.ToString();
+        }
+        else if (!String.IsNullOrEmpty(Model.ContentItem.BodyPart.Text.ToString()))
+        {
+            string bodyHtml = Model.ContentItem.BodyPart.Text.ToString();
+            var body = new HtmlString(Html.Excerpt(bodyHtml, 200).ToString().Replace(Environment.NewLine, "</p>" + Environment.NewLine + "<p>"));
+            descriptionContent = HTMLToText(body.ToString());
+        }
+
+    }
+    catch(System.Exception){
+        try
+        {
+            if (!String.IsNullOrEmpty(Model.ContentItem.BodyPart.Text.ToString()))
+            {
+                string bodyHtmlExceptionCase = Model.ContentItem.BodyPart.Text.ToString();
+                var body = new HtmlString(Html.Excerpt(bodyHtmlExceptionCase, 200).ToString().Replace(Environment.NewLine, "</p>" + Environment.NewLine + "<p>"));
+                descriptionContent = HTMLToText(body.ToString());
+            }
+        }
+        catch(System.Exception){}
+    }
+
+    try
+    {
+        if (!String.IsNullOrEmpty(Model.ContentItem.ImagemPart.ImagemdeDestaque.FirstMediaUrl))
+        {
+            urlImage = WorkContext.CurrentSite.BaseUrl+Model.ContentItem.ImagemPart.ImagemdeDestaque.FirstMediaUrl;
+        }
+
+    }
+    catch (System.Exception) { }
+
+
+    using (Script.Head())
+    {
+        <meta property="og:locale" content="pt_BR">
+ 
+        <meta property="og:url" content="@urlContent">
+ 
+        <meta property="og:title" content="@titleContent">
+        <meta property="og:site_name" content="@siteName">
+ 
+        <meta property="og:description" content="@descriptionContent">
+ 
+        <meta property="og:image" content="@urlImage">
+        <meta property="og:image:width" content="1200"> /** PIXELS **/
+        <meta property="og:image:height" content="630"> /** PIXELS **/
+
+        <meta property="og:type" content="website">
+
+
+        <meta content="@siteName" name="author">
+    }
+
+    SetMeta("twitter:card", "summary");
+    SetMeta("twitter:title", titleContent);
+    SetMeta("twitter:description", descriptionContent);
+    SetMeta("twitter:image", urlImage);
+
+    using (Script.Foot())
+    {
+        <!-- Facebook Shared -->
+        <div id="fb-root"></div>
+
+        <script>
+            
+            $.post(
+                'https://graph.facebook.com',
+                {
+                    id: '@urlContent',
+                    scrape: true
+                },
+                function (response) {
+                    //console.log(response);
+                }
+            );   
+       
+
+            (function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) return;
+              js = d.createElement(s); js.id = id;
+              js.src = "//connect.facebook.net/pt_BR/sdk.js#xfbml=1&version=v2.5";
+              fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));
+        </script>
+
+        <!-- Twitter Shared-->
+        <script>!function (d, s, id) { var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https'; if (!d.getElementById(id)) { js = d.createElement(s); js.id = id; js.src = p + '://platform.twitter.com/widgets.js'; fjs.parentNode.insertBefore(js, fjs); } }(document, 'script', 'twitter-wjs');</script>
+        
+        <!-- Google Plus Shared-->
+        <script src="https://apis.google.com/js/platform.js" async defer>
+            { lang: 'pt-BR' }
+        </script>
+    }
+
+}
+
+@Display(Model.Metadata.ChildContent)
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="shared-social-media">
+            <!-- Facebook Shared -->
+            <div class="fb-share-button" data-href="@urlContent" data-layout="button_count"></div>
+        </div>
+        <div class="shared-social-media">
+            <!-- Twitter Shared-->
+            <a href="@urlContent" class="twitter-share-button" {count}>Tweet</a>
+        </div>
+        <div class="shared-social-media">
+            <!-- Google Plus Shared-->
+            <div class="g-plus" data-action="share" data-annotation="bubble" data-href="@urlContent"></div>
+        </div>
+        <div class="shared-social-media print-content">
+            <a href="javascript:void(0);" onclick="window.print();" title="Imprimir conteúdo">
+                <i class="fa fa-print"></i> <span class="legend">Imprimir</span>
+            </a>
+        </div>
+    </div>
+</div>

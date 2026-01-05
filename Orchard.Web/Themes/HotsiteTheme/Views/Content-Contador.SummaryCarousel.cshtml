@@ -1,0 +1,97 @@
+﻿@using Orchard.Utility.Extensions;
+@{
+    if (Model.Title != null)
+    {
+        Layout.Title = Model.Title;
+    }
+
+    Model.Classes.Add("content-item");
+    //Model.Classes.Add("span-12 col-xs-12 col-md-12 col-sm-12 col-lg-12");
+
+    var contentTypeClassName = ((string)Model.ContentItem.ContentType).HtmlClassify();
+    Model.Classes.Add(contentTypeClassName);
+
+    var tag = Tag(Model, "article");
+    //tag.AddCssClass("row");
+
+    var title = "";
+    var valueItem = "";
+
+    var titleImage = "";
+    var urlImage = "";
+    var iconName = "users";
+
+
+    try
+    {
+        title = Model.ContentItem.TitlePart.Title.ToString();
+    }
+    catch (System.Exception) { }
+
+
+    try
+    {
+        /*Imagem de destaque*/
+        var listFields = Model.ContentItem.ImagemPart.Fields;
+        foreach (var fields in listFields)
+        {
+            foreach (var image in fields.MediaParts) { urlImage = image.MediaUrl; titleImage = image.Title; }
+        }
+    }
+    catch (System.Exception) { titleImage = ""; urlImage = ""; }
+
+
+            @* Icon*@
+            try
+            {
+                if (!String.IsNullOrEmpty(Model.ContentItem.Contador.Icone.Value))
+                {
+                    iconName = Model.ContentItem.Contador.Icone.Value;
+                }
+            }
+            catch (System.Exception) { }
+
+            @* Value *@
+            try
+            {
+                if (!String.IsNullOrEmpty(Model.ContentItem.Contador.Valor.Value))
+                {
+                    valueItem = Model.ContentItem.Contador.Valor.Value;
+                }
+            }
+            catch (System.Exception) { }
+
+
+}
+@tag.StartElement
+
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="box-feature text-center wow fadeInLeft animated animated">
+            <div class="box-image">
+                @if (!String.IsNullOrEmpty(urlImage))
+                {
+                    <img class="img-service" src="@Display.ResizeMediaUrl(Width: 100, Height: 100, Mode: "crop", Alignment: "middlecenter", Path: urlImage)" alt="@titleImage" />
+                }
+                else {
+                    <span class="service-icon link-color-color"><i class="link-color-color fa fa-@iconName" aria-hidden="true"></i></span>
+                }
+            </div>
+            <div class="box-content">
+                @if (!String.IsNullOrEmpty(valueItem))
+                {
+                    <div class="box-statistic-counter link-color-color">
+                        @Html.Raw(valueItem)
+                    </div>
+                }
+                <div class="box-statistic-text link-color-color">
+                    @title
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    
+
+@tag.EndElement

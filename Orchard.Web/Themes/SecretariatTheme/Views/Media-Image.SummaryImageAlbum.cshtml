@@ -1,0 +1,37 @@
+﻿@using Orchard.MediaLibrary.Models
+@using Orchard.Utility.Extensions;
+@{
+    MediaPart mediaPart = Model.ContentItem.MediaPart;
+    //Layout.Title = mediaPart.Title;
+    var contentTypeClassName = mediaPart.ContentItem.ContentType.HtmlClassify();
+
+    var caption = "";
+    var fotografo = "";
+    
+    
+}
+@if (!String.IsNullOrEmpty(Model.ContentItem.MediaPart.Caption))
+{
+    caption = Model.ContentItem.MediaPart.Caption;
+    try
+    {
+        if (!String.IsNullOrEmpty(Model.ContentItem.ImagePart.Fotografo.Value))
+        {
+            fotografo = "Foto: " + Model.ContentItem.ImagePart.Fotografo.Value;
+            caption += " ("+fotografo+")";
+        }
+    }
+    catch (System.Exception) { }
+
+}
+@{
+
+    var bgImageDefault = "background-image: url(\""+ Display.ResizeMediaUrl(Width: 160, height: 110, Mode: "crop", Alignment: "middlecenter", Path: Model.ContentItem.MediaPart.MediaUrl) + "\");";
+    var mediumImageURL = Display.ResizeMediaUrl(Width: 800, Mode: "max", Alignment: "middlecenter", Path: Model.ContentItem.MediaPart.MediaUrl);
+    <div class="span-3 col-xs-12 col-sm-5 col-md-4 col-lg-3">
+    <a class="thumbnail album-image-item" rel="prettyPhoto[gallery2]" data-image-full="@Model.ContentItem.MediaPart.MediaUrl" href="@mediumImageURL" title="@caption">
+        <span class="album-image-thumb" style="@bgImageDefault"></span>
+    </a>
+    </div>
+
+}

@@ -1,0 +1,89 @@
+﻿@using Orchard.Mvc.Html;
+@using Orchard.UI.Resources;
+@{
+    RegisterLink(new LinkEntry { Type = "image/x-icon", Rel = "shortcut icon", Href = "//cdn.es.gov.br/images/favicons/governo/favicon.ico" });
+    Script.Include("//cdn.es.gov.br/scripts/extensions/html5shiv/3.7.2/html5shiv.min.js").UseCondition("lt IE 9").AtHead();
+    Script.Include("//cdn.es.gov.br/scripts/extensions/respond/1.4.2/respond.min.js").UseCondition("lt IE 9").AtHead();
+
+
+    string nameInstitute = WorkContext.Layout.NomeInstituicao.ToString();
+    string abbreviationInstitute = WorkContext.Layout.SiglaInstituicao.ToString();
+
+    string title = Convert.ToString(Model.Title);
+    string siteName = Convert.ToString(WorkContext.CurrentSite.SiteName);
+
+
+    /*Define siteName custom*/
+    if (!String.IsNullOrEmpty(nameInstitute))
+    {
+        siteName = nameInstitute;
+    }
+    else if (!String.IsNullOrEmpty(abbreviationInstitute))
+    {
+        siteName = abbreviationInstitute;
+    }
+
+    /*Define siteName and title custom*/
+    if (String.IsNullOrEmpty(title))
+    {
+        if (!String.IsNullOrEmpty(abbreviationInstitute) && !String.IsNullOrEmpty(nameInstitute))
+        {
+            title = nameInstitute;
+            siteName = abbreviationInstitute;
+        }
+    }
+    else
+    {
+        if (!String.IsNullOrEmpty(abbreviationInstitute))
+        {
+            siteName = abbreviationInstitute;
+        }
+    }
+
+}
+<!DOCTYPE html>
+<!--
+
+     o O O
+    o
+   TS__[O]
+| {======|_|
+  /o--000'"`
+       ___     __ _
+      |_ _|   / _` |   ___      _ _
+       | |    \__, |  / _ \    | '_|
+      |___|   |___/   \___/   _|_|_
+    _|"""""|_|"""""|_|"""""|_|"""""|
+    "`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'
+                ___                     _      _
+               | __|    _ _    ___     (_)    | |_    __ _     ___
+               | _|    | '_|  / -_)    | |    |  _|  / _` |   (_-<
+              _|_|_   _|_|_   \___|   _|_|_   _\__|  \__,_|   /__/_
+            _| """ |_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|
+            "`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'
+                                                                     o O O
+                                                                    o
+                                                                   TS__[O]
+                                                                | {======|_|
+                                                                  /o--000'"`
+
+-->
+<html lang="@WorkContext.CurrentCulture" class="static @Html.ClassForPage()">
+<head>
+    <meta charset="utf-8" />
+    <title>@Html.Title(title, siteName)</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    @Display(Model.Head)
+    @using (Script.Foot())
+    {
+    <script type="text/javascript">
+        (function (d) { d.className = "dyn" + d.className.substring(6, d.className.length); })(document.documentElement);
+    </script>
+    }
+</head>
+<body>
+    @* Layout (template) is in the Body zone @ the default position (nothing, zero, zilch) *@
+    @Display(Model.Body)
+    @Display(Model.Tail)
+</body>
+</html>

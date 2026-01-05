@@ -1,0 +1,100 @@
+@using Orchard.Taxonomies.Models;
+@using Orchard.Taxonomies.Services;
+@using Orchard.ContentManagement;
+@using Orchard.Utility.Extensions;
+@using Orchard.Mvc.Html;
+@using System.Linq;
+
+
+
+@{
+    var sections = ((IEnumerable<IContent>)Model.ContentItems).ToList();
+    Dictionary<string, int> taxonomiaDictionary = new Dictionary<string, int>();
+
+    var contentManager = Model.ContentItem.ContentManager;
+
+}
+
+@foreach (var section in sections)
+{
+    var termParts = section.As<TermsPart>();
+    foreach (var contentItemPart in termParts.TermParts)
+    {
+
+        taxonomiaDictionary[contentItemPart.Field] = contentItemPart.TermPart.TaxonomyId;
+    }
+}
+
+
+@if (taxonomiaDictionary.Count > 0)
+{
+    <form id="taxonomyForm">
+
+        @foreach (var taxonomiaItem in taxonomiaDictionary)
+        {
+            Orchard.ContentManagement.ContentItem[] taxonomia = contentManager.HqlQuery().ForType("Taxonomy").List();
+            Func<ContentItem, bool>
+                init = s => s.Id == taxonomiaItem.Value;
+            var taxonomyPart = taxonomia.Where(new Func<ContentItem, bool>
+                (init)).FirstOrDefault<ContentItem>
+                    ().As<TaxonomyPart>
+                        ();
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <label class="text-uppercase"><strong>@taxonomyPart.Name</strong></label>
+                        <select id="taxonomia-@taxonomyPart.Id" class="form-control" name="@taxonomyPart.Name">
+                            <option value="">Selecione...</option>
+                            @foreach (var termPart in taxonomyPart.Terms)
+                            {
+                                <option value="@termPart.Slug">@termPart.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            break;
+
+        }
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-12 text-right">
+                    <button type="submit" class="btn btn-primary btn-md background-primary-button-background-color primary-button-border-border-color font-color-primary-button-color">Pesquisar</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <script>
+        document.forms["taxonomyForm"].onsubmit = function (e) {
+            e.preventDefault(); //cancel form submit
+            var str1 = "taxonomia-";
+            var str2 = [];
+            var link = "";
+            @{ 
+                foreach (var taxonomiaItem in taxonomiaDictionary){
+                    @Html.Raw("str2.push("+taxonomiaItem.Value+");");
+                    break;
+                }
+            }
+            for (i = 0; i < str2.length; i++) {
+                var el = document.getElementById(str1.concat(str2[i]));
+                var selectedArea = el.options[el.selectedIndex].value;
+                if (selectedArea) {
+                    link = selectedArea;
+                }
+            }
+            window.open(link,'_self');
+
+            //post searchValue to your PHP page using your favorite JS library,
+            //then in the call back, submit your form with self.submit();
+        };
+    </script>
+}
+
+
+
+
+

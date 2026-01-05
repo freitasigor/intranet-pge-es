@@ -1,0 +1,14 @@
+
+/*Geometos Rounded Regular*/
+
+@font-face {
+    font-family: 'GeometosRounded-Regular';
+    src: url('../fonts/GeometosRounded-Regular.eot');
+    src: url('../fonts/GeometosRounded-Regular.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/GeometosRounded-Regular.woff2') format('woff2'),
+         url('../fonts/GeometosRounded-Regular.woff') format('woff'),
+         url('../fonts/GeometosRounded-Regular.ttf') format('truetype'),
+         url('../fonts/GeometosRounded-Regular.svg') format('svg');
+    font-weight: 400;
+    font-style: normal;
+}

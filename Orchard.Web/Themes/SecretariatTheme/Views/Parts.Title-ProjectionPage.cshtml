@@ -1,0 +1,20 @@
+@{
+    Layout.Title = Model.Title;
+}
+
+<h2 class="title-content title-content-summary">@Model.Title</h2>
+<div class="author">
+    @if(!String.IsNullOrEmpty(Model.ContentItem.CommonPart.OwnerField.Value.UserName) && Model.ContentItem.ContentType == "Noticia")
+    {
+        string author = Model.ContentItem.CommonPart.OwnerField.Value.UserName;
+        author = author.ToLower();
+        author = author.Replace(".", " ");
+        <span>por </span>
+        <span class="name-author">
+            @foreach (var stringAuthor in author)
+            {
+                @stringAuthor
+            }
+        </span>
+    }
+</div>

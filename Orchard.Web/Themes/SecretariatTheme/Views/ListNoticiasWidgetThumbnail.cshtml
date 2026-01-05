@@ -1,0 +1,40 @@
+@{
+
+Model.Id = "slider-"+Model.ContentItem.Id;
+var tag = Tag(Model, "div");
+tag.AddCssClass("row");
+var list =  Model.ContentItems;
+var index = 0;
+
+          
+@tag.StartElement
+
+
+<!-- thumb navigation carousel -->
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="slider-thumbs-@(Model.ContentItem.Id)">
+    <div class="container-fluid">
+        <ul id="effect-6" class="effects list-thumb" >
+                                
+            @{index = 0;}
+            @foreach (var item in list) {
+                                    
+                var attr = "";
+ 
+                if (index == 0) { attr+="first";}
+                                                                 
+                <li class="row list-thumb-row list-content-item @attr" id="thumb-selector-@index">
+                    @Display(BuildDisplay(item, "SummaryNoticiaThumbnail"))
+                </li> 
+                ++index;
+            }
+
+        </ul>
+    </div>
+    <!-- thumb navigation carousel items -->
+</div>  
+
+
+@tag.EndElement
+<!--/main slider carousel--> 
+
+}

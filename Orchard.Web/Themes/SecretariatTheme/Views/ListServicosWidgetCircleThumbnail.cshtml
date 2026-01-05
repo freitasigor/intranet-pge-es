@@ -1,0 +1,38 @@
+@using Orchard.Taxonomies.Models;
+@using Orchard.ContentManagement;
+@using Orchard.Utility.Extensions;
+@using Orchard.Mvc.Html;
+@using System.Linq;
+@{
+    Model.Id = "servicos-" + Model.ContentItem.Id;
+    var tag = Tag(Model, "div");
+    tag.AddCssClass("row");
+    tag.AddCssClass("row-servicos");
+    var list = Model.ContentItems;
+    var contentManager = Model.ContentItem.ContentManager;
+    var index = 0;
+
+}
+
+
+@tag.StartElement
+
+    @try
+    {
+
+        foreach (var item in list)
+        {
+            var attr = "";
+            if (index == 0) { attr += "first active"; }
+
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 crsl-item @attr ">
+                @Display(BuildDisplay(item, "SummaryCircleThumbnail"))
+            </div>
+
+            ++index;
+        }
+
+    }
+    catch (System.Exception ex) { }
+@tag.EndElement
+

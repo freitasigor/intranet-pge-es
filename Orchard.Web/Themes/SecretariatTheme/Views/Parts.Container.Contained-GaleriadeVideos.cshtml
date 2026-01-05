@@ -1,0 +1,14 @@
+﻿@using Orchard.Utility.Extensions;
+@{
+    var contentTypeClassName = ((string)Model.ContentItem.ContentType).HtmlClassify();
+    Model.List.Classes.Add(contentTypeClassName);
+    Model.List.Classes.Add("crsl-wrap row content-wrapper album-wrapper equal-height-list");
+    Model.List.ItemClasses.Add("crsl-item equal-height-item span-4 col-xs-12 col-sm-12 col-md-6 col-lg-6");
+}
+
+
+@Display(Model.List)
+
+<div class="row">
+    @Display(Model.Pager)
+</div>

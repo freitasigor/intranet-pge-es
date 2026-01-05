@@ -1,0 +1,74 @@
+﻿@*
+    This shape displays a term and all content items associated to it.
+    - ContentItems is a List shape
+    - Pager is a Pager shape
+    - Taxonomy is the parent taxonomy
+    - ContentPart is the TermPart displayed
+*@
+
+@using Orchard.Taxonomies.Models;
+@using Orchard.ContentManagement;
+@using Orchard.Utility.Extensions;
+@using Orchard.Mvc.Html;
+@using System.Linq;
+
+@{
+    Model.ContentItems.Id = "licitacoes-" + Model.ContentItem.Id;
+    Model.ContentItems.Classes.Add("row-licitacoes");
+    var contentManager = Model.ContentItem.ContentManager;
+    Dictionary<int, Orchard.Taxonomies.Models.TermPart> modalidadeTerms = new Dictionary<int, Orchard.Taxonomies.Models.TermPart>();
+
+    var modalidadeQuery = contentManager.HqlQuery().ForType("ModalidadedeLicitacaoTerm").ForVersion(VersionOptions.Published);
+    var listModalidadeQuery = modalidadeQuery.List();
+
+    foreach(var termQuery in listModalidadeQuery)
+    {
+        var termItem = ((IContent)termQuery).As<TermPart>();
+        @*
+            <span>termItem.Id: </span>@termItem.Id
+            <span>termItem.Container.Id: </span>@termItem.Container.Id
+            <span>termItem.TaxonomyId: </span>@termItem.TaxonomyId<br />
+        *@
+        if (termItem.Count > 0 || termItem.Selectable == false)
+        {
+            modalidadeTerms[termItem.Id] = termItem;        
+        }
+        
+    }
+}
+
+@if (modalidadeTerms.Count > 0)
+{
+    <!-- begin Filtro Licitacoes-->
+    <div class="row filter-licitacao">
+        <form>
+            <div class="form-group filter-select-group">
+                <label>Selecione uma modalidade</label>
+                <select class="form-control filter-select filter-modalidade">
+                    @foreach (KeyValuePair<int, Orchard.Taxonomies.Models.TermPart> term in modalidadeTerms.OrderByDescending(i => i.Value.Container.Id))
+                    {
+                        var selectedOption = "";
+                        if (term.Value.Id == Model.ContentItem.Id) { selectedOption = "selected"; }
+
+                        <option value="@Url.ItemDisplayUrl(term.Value)" @selectedOption>
+                            @if (term.Value.Container.Id != term.Value.TaxonomyId)
+                            { @term.Value.Name }
+                            else
+                            { @Html.Raw("Todas") }
+                        </option>
+                    }
+                </select>
+            </div>
+        </form>
+    </div>
+    <!-- end Filtro Licitacoes-->
+    <div id="loading-image"></div>
+}
+
+
+@{
+    Model.ContentItems.Classes.Add("content-items");
+}
+
+@Display(Model.ContentItems)
+@Display(Model.Pager)

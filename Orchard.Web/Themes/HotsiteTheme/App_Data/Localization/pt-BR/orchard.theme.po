@@ -1,0 +1,140 @@
+
+#. "Open menu"
+msgctxt "~/Themes/HotsiteTheme/Views/Layout.cshtml"
+msgid "Open menu"
+msgstr "Abrir o menu"
+
+#. "Open search field"
+msgctxt "~/Themes/HotsiteTheme/Views/Layout.cshtml"
+msgid "Open search field"
+msgstr "Abrir o campo de busca"
+
+#. "Search"
+msgctxt "~/Themes/HotsiteTheme/Views/Parts.Search.SearchForm.cshtml"
+msgid "Search"
+msgstr "Buscar"
+
+#. "Close search field"
+msgctxt "~/Themes/HotsiteTheme/Views/Parts.Search.SearchForm.cshtml"
+msgid "Close search field"
+msgstr "Fechar campo de busca"
+
+#. "Sign In to"
+msgctxt "~/Themes/HotsiteTheme/Views/LogOn.cshtml"
+msgid "Sign In to Site"
+msgstr "Logar no Site"
+
+#. "Login was unsuccessful. Please correct the errors and try again."
+msgctxt "~/Themes/HotsiteTheme/Views/LogOn.cshtml"
+msgid "Login was unsuccessful. Please correct the errors and try again."
+msgstr "O login não foi bem-sucedido. Favor corrigir os erros abaixo e tentar novamente:"
+
+#. "Orchard.Users.Controllers.AccountController"
+msgctxt "Orchard.Users.Controllers.AccountController"
+msgid "You must specify a username or e-mail."
+msgstr "O campo usuário é obrigatório."
+
+#. "Orchard.Users.Controllers.AccountController"
+msgctxt "Orchard.Users.Controllers.AccountController"
+msgid "You must specify a password."
+msgstr "O campo senha é obrigatório."
+
+#. "Orchard.Users.Controllers.AccountController"
+msgctxt "Orchard.Users.Controllers.AccountController"
+msgid "The username or e-mail or password provided is incorrect."
+msgstr "O usuário e/ou a senha estão incorretos."
+
+#. "Username:"
+msgctxt "~/Themes/HotsiteTheme/Views/LogOn.cshtml"
+msgid "Username:"
+msgstr "Usuário:"
+
+#. "Password:"
+msgctxt "~/Themes/HotsiteTheme/Views/LogOn.cshtml"
+msgid "Password:"
+msgstr "Senha:"
+
+#. "Remember me"
+msgctxt "~/Themes/HotsiteTheme/Views/LogOn.cshtml"
+msgid "Remember me"
+msgstr "Lembre-me"
+
+#. "Login"
+msgctxt "~/Themes/HotsiteTheme/Views/LogOn.cshtml"
+msgid "Login"
+msgstr "Entrar"
+
+#. "Log On"
+msgctxt "~/Themes/HotsiteTheme/Views/LogOn.cshtml"
+msgid "Log On"
+msgstr "Entrar"
+
+#. "Reset"
+msgctxt "~/Themes/HotsiteTheme/Views/LogOn.cshtml"
+msgid "Reset"
+msgstr "Limpar"
+
+#. "Change Password"
+msgctxt "~/Themes/HotsiteTheme/Views/Orchard.Users/Account/ChangePassword.cshtml"
+msgid "Change Password"
+msgstr "Alterar Senha"
+
+#. "Use the form below to change your password."
+msgctxt "~/Themes/HotsiteTheme/Views/Orchard.Users/Account/ChangePassword.cshtml"
+msgid "Use the form below to change your password."
+msgstr "Utilize o formulário abaixo para alterar a sua senha."
+
+#. "New passwords are required to be a minimum of {0} characters in length."
+msgctxt "~/Themes/HotsiteTheme/Views/Orchard.Users/Account/ChangePassword.cshtml"
+msgid "New passwords are required to be a minimum of {0} characters in length."
+msgstr "Atenção: A nova senha deverá ter no mínimo {0} caracteres."
+
+#. "Current Password"
+msgctxt "~/Themes/HotsiteTheme/Views/Orchard.Users/Account/ChangePassword.cshtml"
+msgid "Current Password"
+msgstr "Senha atual"
+
+#. "New Password"
+msgctxt "~/Themes/HotsiteTheme/Views/Orchard.Users/Account/ChangePassword.cshtml"
+msgid "New Password"
+msgstr "Nova senha"
+
+#. "Confirm Password"
+msgctxt "~/Themes/HotsiteTheme/Views/Orchard.Users/Account/ChangePassword.cshtml"
+msgid "Confirm Password"
+msgstr "Confirmar nova senha"
+
+#. "Submit"
+msgctxt "~/Themes/HotsiteTheme/Views/Orchard.CustomForms/Item/Create.cshtml"
+msgid "Submit"
+msgstr "Enviar"
+
+#. "Submit"
+msgctxt "~/Themes/HotsiteTheme/Views/Orchard.CustomForms/Parts.CustomForm.Wrapper.cshtml"
+msgid "Submit"
+msgstr "Enviar"
+
+#. "Tags:"
+msgctxt "~/Themes/HotsiteTheme/Views/Parts.Tags.ShowTags.cshtml"
+msgid "Tags:"
+msgstr "Tópicos:"
+
+#. "Contents tagged with {0}"
+msgctxt "~/Themes/HotsiteTheme/Views/Orchard.Tags/Home/Search.cshtml"
+msgid "Contents tagged with {0}"
+msgstr "Conteúdos marcados com {0}"
+
+#. "Contents tagged with <span>{0}</span>"
+msgctxt "~/Themes/HotsiteTheme/Views/Orchard.Tags/Home/Search.cshtml"
+msgid "Contents tagged with <span>{0}</span>"
+msgstr "Conteúdos marcados com <span>{0}</span>"
+
+#. "more"
+msgctxt "~/Themes/HotsiteTheme/Views/Parts.Common.Body.Summary.cshtml"
+msgid "more"
+msgstr "Leia mais"
+
+#: "~/Themes/HotsiteTheme/Views/Content.ControlWrapper.cshtml"
+msgctxt "~/Themes/HotsiteTheme/Views/Content.ControlWrapper.cshtml"
+msgid "Edit"
+msgstr "Editar"

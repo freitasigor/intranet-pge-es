@@ -1,0 +1,186 @@
+﻿@using System;
+@using System.Text.RegularExpressions;
+@using JetBrains.Annotations;
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using System.Net;
+@using Orchard.ContentManagement;
+@using Orchard.Utility.Extensions;
+@{
+    if (Model.Title != null)
+    {
+        Layout.Title = Model.Title;
+    }
+
+    var contentTypeClassName = ((string)Model.ContentItem.ContentType).HtmlClassify();
+    Model.Classes.Add("content-item-" + contentTypeClassName);
+    Model.Classes.Add("content-item");
+
+    var contents = Model.ContentItem.Slide.ImagemdeFundo;
+    var contentLogicalType = "";
+    try
+    {
+       contentLogicalType = contents.MediaParts[0].LogicalType;
+    } catch (System.Exception) { }
+
+
+    var tag = Tag(Model, "div");
+
+    Regex VimeoVideoRegex = new Regex(@"vimeo\.com/(?:channels\/|channels\/\w+\/|groups\/[^\/]*\/videos\/|album‌​\/\d+\/video\/|video\/|)?([0-9]+)", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+    Regex YoutubeVideoRegex = new Regex(@"youtu(?:\.be|be\.com)/(?:.*v(?:/|=)|(?:.*/)?)([a-zA-Z0-9-_]+)", RegexOptions.IgnoreCase);
+}
+@{
+    var urlImage = "";
+    var descriptionSlide = "";
+    var urlSlide = "javascript:void(0);";
+    var target = "_self";
+    var videoRel = "";
+    var title_link = "Acessar";
+    bool isVideo = false;
+
+    if (contentLogicalType == "OEmbed")
+    {
+        urlSlide = contents.MediaParts[0].ContentItem.OEmbedPart.Source.ToString();
+    }
+
+    try
+    {
+
+        @* Description Slide*@
+        if (!String.IsNullOrEmpty(Model.ContentItem.Slide.Descricao.Value))
+        {
+            descriptionSlide = Model.ContentItem.Slide.Descricao.Value;
+        }
+
+                @* Background Image Slide*@
+        if (!String.IsNullOrEmpty(Model.ContentItem.Slide.ImagemdeFundo.FirstMediaUrl))
+        {
+            urlImage = Model.ContentItem.Slide.ImagemdeFundo.FirstMediaUrl;
+        }
+        else if (contentLogicalType == "OEmbed")
+        {
+
+            Match youtubeMatch = YoutubeVideoRegex.Match(urlSlide);
+            Match vimeoMatch = VimeoVideoRegex.Match(urlSlide);
+
+            string id = string.Empty;
+
+            if (youtubeMatch.Success)
+            {
+                id = youtubeMatch.Groups[1].Value;
+                urlImage = "http://img.youtube.com/vi/" + id + "/hqdefault.jpg";
+                isVideo = true;
+            }
+
+            if (vimeoMatch.Success)
+            {
+                id = vimeoMatch.Groups[1].Value;
+                /* json treatment - begin*/
+                var json = "";
+                using (WebClient wc = new WebClient()) { json = wc.DownloadString("http://vimeo.com/api/v2/video/" + id + ".json"); }
+                dynamic jsonDeserialized = JsonConvert.DeserializeObject<dynamic>(json);
+                string jsonDeserializedString = ((Newtonsoft.Json.Linq.JContainer)jsonDeserialized).First.ToString();
+                dynamic jsonObj = JObject.Parse(jsonDeserializedString);
+                /* json treatment - end*/
+
+                urlImage = jsonObj.thumbnail_large.Value;
+                isVideo = true;
+            }
+            @* Set Video Element*@
+            if (isVideo)
+            {
+                videoRel = "prettyVideo[gallery2]";
+                title_link = descriptionSlide;
+            }
+            /*
+            Sizes Youtube image
+                http://img.youtube.com/vi/<insert-youtube-video-id-here>/default.jpg
+                http://img.youtube.com/vi/<insert-youtube-video-id-here>/hqdefault.jpg
+                http://img.youtube.com/vi/<insert-youtube-video-id-here>/mqdefault.jpg
+                http://img.youtube.com/vi/<insert-youtube-video-id-here>/sddefault.jpg
+                http://img.youtube.com/vi/<insert-youtube-video-id-here>/maxresdefault.jpg
+            */
+
+        }
+
+
+            @* URL Slide*@
+        if (!String.IsNullOrEmpty(Model.ContentItem.Slide.Arquivo.FirstMediaUrl))
+        {
+            urlSlide = Model.ContentItem.Slide.Arquivo.FirstMediaUrl;
+        }
+
+        else if (Model.ContentItem.Slide.Conteudo.ContentItems.Length > 0)
+        {
+            foreach (var contentitems in Model.ContentItem.Slide.Conteudo.ContentItems)
+            {
+                urlSlide = Href("~/") + contentitems.AutoroutePart.DisplayAlias;
+            }
+        }
+        else if (!String.IsNullOrEmpty(Model.ContentItem.Slide.LinkExterno.Value))
+        {
+            urlSlide = Model.ContentItem.Slide.LinkExterno.Value;
+        }
+
+        @* Target Slide*@
+        if (Model.ContentItem.Slide.AbriremNovaJanela.Value == "Sim")
+        {
+            target = "_blank";
+        }
+
+
+}catch (System.Exception) { }
+
+}
+
+
+@tag.StartElement
+    <a href="@urlSlide" title="@title_link" target="@target" rel="@videoRel">
+
+
+        @if(contents.MediaParts.Count > 0)
+        {
+
+            foreach (var content in contents.MediaParts)
+            {
+                if (contentLogicalType != "OEmbed")
+                {
+                    @Display(Model.ContentItem.ContentManager.BuildDisplay(content, "SummaryImagemdeDestaqueSlide"))
+                }
+                else
+                {
+                    var bgImageDefault = "background-image: url(\"" + Display.ResizeMediaUrl(Width: 780, Mode: "crop", Alignment: "middlecenter", Path: urlImage) + "\");";
+                    if (isVideo)
+                    {
+                        <span class="text-center bg-img-content" style="@bgImageDefault">
+                            <i class="fa fa-play video-play" style="font-size: 7em;position: relative;left: 0;top: 37%;"></i>
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="bg-img-content" style="@bgImageDefault">
+                        </span>
+                    }
+                }
+
+            }
+
+        }
+        else
+        {
+            <span class="bg-img-content"></span>
+        }
+
+
+        @if (!String.IsNullOrEmpty(descriptionSlide))
+        {
+
+            <div class="carousel-caption">
+                <h4>
+                    @descriptionSlide
+                </h4>
+            </div>
+        }
+
+    </a>
+@tag.EndElement

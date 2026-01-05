@@ -1,0 +1,179 @@
+﻿@using Orchard.Utility.Extensions;
+@{
+    if (Model.Title != null) {
+        Layout.Title = Model.Title;
+    }
+ 
+    /*Begin class collapse*/
+    var expanded = "false";
+    var collapseClass = "";
+    var panelClass = "";
+    var iconPanel = "";
+    
+    try
+    {
+        int qtdContents = Model.ContentItem.CommonPart.Container.ContainerPart.ItemCount;
+        if (qtdContents == 1)
+        {
+            expanded = "true";
+            collapseClass = "in";
+            panelClass = "painel-ativo active";
+            iconPanel = "fa-minus";
+        }        
+    }
+    catch (System.Exception ex) { }    
+    /*end class collapse*/    
+    
+    
+}
+ 
+<div class="panel-heading @panelClass" role="tab" id="heading-@Model.ContentItem.Id">
+    <a class="" data-toggle="collapse" href="#collapse-@Model.ContentItem.Id" aria-expanded=@expanded aria-controls="collapse-@Model.ContentItem.Id">
+        <h4 class="panel-title">
+            @if (!String.IsNullOrEmpty(Model.ContentItem.TitlePart.Title.ToString()))
+            {
+                <span class="paneltitle-value">@Model.ContentItem.TitlePart.Title.ToString()</span>
+            }
+            <i class="fa fa-plus @iconPanel"></i>
+        </h4>
+        <span class="bottom-triangle active"></span>
+    </a>
+</div>
+
+<div id="collapse-@Model.ContentItem.Id" class="panel-collapse collapse @collapseClass" role="tabpanel" aria-labelledby="heading-@Model.ContentItem.Id">
+
+    @try
+    {
+        if (!String.IsNullOrEmpty(Model.ContentItem.GrupodeArquivos.Descricao.Value))
+        {
+            <div class="panel-body">
+                <div class="description-table-container">
+                    <div class="description-table-content">
+                        <span class="description-value">@Model.ContentItem.GrupodeArquivos.Descricao.Value</span>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    catch (System.Exception ex) { } 
+
+    <div class="panel-body">
+        <div class="table-responsive">
+
+            <table class="table table-bordered table-hover table-downloads">
+                <thead class="table-header-bg-color-background-color table-header-font-color-color">
+                    <tr>
+                        <th class="coluna-1">
+                            Conteúdo
+                            <span class="directional-sort">
+                                <i class="fa fa-caret-up"></i>
+                                <i class="fa fa-caret-down"></i>
+                            </span>
+
+                        </th>
+                        <th class="coluna-2">
+                            Atualização
+                            <span class="directional-sort">
+                                <i class="fa fa-caret-up"></i>
+                                <i class="fa fa-caret-down"></i>
+                            </span>
+                        </th>
+                        <th class="coluna-3">
+                            Formato
+                            <span class="directional-sort">
+                                <i class="fa fa-caret-up"></i>
+                                <i class="fa fa-caret-down"></i>
+                            </span>
+                        </th>
+                        <th class="coluna-4">
+                            Tamanho
+                            <span class="directional-sort">
+                                <i class="fa fa-caret-up"></i>
+                                <i class="fa fa-caret-down"></i>
+                            </span>
+                        </th>
+                        <th class="coluna-5"></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @try
+                    {
+
+                        foreach (var media in Model.ContentItem.GrupodeArquivos.Arquivos.MediaParts)
+                        {
+
+                            /*
+                                <span>Titulo: </span>@media.Title<br />
+                                <span>Mime Type: </span>@media.MimeType<br />
+                                <span>ALT(Alternat Text): </span>@media.AlternateText<br />
+                                <span>Caption: </span>@media.Caption<br />
+                                <span>Folder Path: </span>@media.FolderPath<br />
+                                <span>File name: </span>@media.FileName<br />
+                                <span>Media URL: </span>@media.MediaUrl<br />
+                                <span>Logical Type: </span>@media.LogicalType<br />
+                                <hr /><hr /><br />
+
+                            */
+
+                            string[] typeArray = media.FileName.Split(new Char[] { '.' });
+                            string[] mimeTypeArray = media.MimeType.Split(new Char[] { '/', '.' });
+                            var urlMedia = media.MediaUrl;
+                            var iconType = typeArray.Last().Trim();
+                            string typeContent = ((Orchard.ContentManagement.ContentPart)media).ContentItem.ContentType.ToString();
+                            var tamKiloBytes = "";
+                            switch (typeContent)
+                            {
+                                case "Document":
+                                    tamKiloBytes = (media.ContentItem.DocumentPart.Length / 1024).ToString();
+                                    break;
+                                case "OEmbed":
+                                    urlMedia = media.ContentItem.OEmbedPart.Source.ToString();
+                                    iconType = "video";
+                                    break;
+                                default:
+                                    tamKiloBytes = "";
+                                    urlMedia = media.MediaUrl;
+                                    break;
+                            }
+
+
+                            <tr>
+                                <th class="coluna-1">
+                                    <a href="@urlMedia" title="Baixar: @media.Title" download><span class="conteudo-value" >@media.Title</span></a>
+                                    @if (!String.IsNullOrEmpty(media.Caption.ToString()))
+                                    {   
+                                        <div class="caption">
+                                            <span class="caption-value">@media.Caption</span>
+                                        </div>
+                                    }
+                                </th>
+                                <th class="coluna-2"><span class="dataatualizacao-value"> @Display.DateTime(DateTimeUtc: media.ContentItem.CommonPart.CreatedUtc, CustomFormat: T("dd/MM/yyyy"))</span></th>
+                                <th class="coluna-3"><span title="@typeArray.Last()" class="icon-format icon-@iconType @mimeTypeArray[0] @iconType"></span>@iconType</th>
+                                <th class="coluna-4">
+                                    @if (!String.IsNullOrEmpty(tamKiloBytes.ToString()))
+                                    {
+                                        <span>@tamKiloBytes kB</span>
+                                    }
+                                </th>
+                                <th class="coluna-5">
+                                    <a href="@urlMedia" title="Baixar: @media.Title" class="btn btn-default" download>
+                                        Baixar
+                                    </a>
+                                </th>
+                            </tr>
+
+                        }
+
+                    }
+                    catch (System.Exception ex) { }
+
+                </tbody>
+            </table>
+
+        </div>
+
+
+    </div><!-- panel-body -->
+</div><!-- panel-collapse -->
+

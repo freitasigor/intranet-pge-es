@@ -1,0 +1,155 @@
+﻿@using Orchard.Utility.Extensions;
+@{
+    if (Model.Title != null)
+    {
+        Layout.Title = Model.Title;
+    }
+
+    Model.Classes.Add("content-item");
+    //Model.Classes.Add("span-12 col-xs-12 col-md-12 col-sm-12 col-lg-12");
+
+    var contentTypeClassName = ((string)Model.ContentItem.ContentType).HtmlClassify();
+    Model.Classes.Add(contentTypeClassName);
+
+    var tag = Tag(Model, "article");
+    tag.AddCssClass("row");
+
+    var title = "";
+    var description = "";
+    var urlField = "javascript:void(0);";
+    var fieldFileUrl = "";
+    var fieldContentUrl = "";
+    var fieldLinkUrl = "";
+    var target = "_self";
+
+    var titleImage = "";
+    var urlImage = "";
+    var iconName = "users";
+
+
+    try
+    {
+        title = Model.ContentItem.TitlePart.Title.ToString();
+    }
+    catch (System.Exception) { }
+
+
+    @* Description*@
+    try
+    {
+        if (!String.IsNullOrEmpty(Model.ContentItem.Servico.Descricao.Value))
+        {
+            string excerptHtml = Model.ContentItem.Servico.Descricao.Value.ToString();
+            var excerptsTemp = new HtmlString(Html.Excerpt(excerptHtml, 300).ToString().Replace(Environment.NewLine, "</p>" + Environment.NewLine + "<p>"));
+            description = excerptsTemp.ToString();
+        }
+    }
+    catch (System.Exception) { }
+
+
+
+            /*File Url*/
+            try
+            {
+                fieldFileUrl = Model.ContentItem.Servico.Arquivo.FirstMediaUrl;
+            }
+            catch (System.Exception) { fieldFileUrl = ""; }
+
+            /*Content Url*/
+            try
+            {
+                foreach (var contentitems in Model.ContentItem.Servico.Conteudo.ContentItems)
+                {
+                    fieldContentUrl = contentitems.AutoroutePart.DisplayAlias;
+                }
+            }
+            catch (System.Exception) { fieldContentUrl = ""; }
+
+            /*Link Url*/
+            try
+            {
+                fieldLinkUrl = Model.ContentItem.Servico.LinkExterno.Value;
+            }
+            catch (System.Exception) { fieldLinkUrl = ""; }
+
+            /*Target Url*/
+            try
+            {
+                if (Model.ContentItem.Servico.AbriremNovaJanela.Value == "Sim")
+                {
+                    target = "_blank";
+                }
+            }
+            catch (System.Exception) { target = "_self"; }
+
+
+
+            try
+            {
+                /*Imagem de destaque*/
+                var listFields = Model.ContentItem.ImagemPart.Fields;
+                foreach (var fields in listFields)
+                {
+                    foreach (var image in fields.MediaParts) { urlImage = image.MediaUrl; titleImage = image.Title; }
+                }
+            }
+            catch (System.Exception) { titleImage = ""; urlImage = ""; }
+
+
+
+            @* Icon*@
+            try
+            {
+                if (!String.IsNullOrEmpty(Model.ContentItem.Servico.Icone.Value))
+                {
+                    iconName = Model.ContentItem.Servico.Icone.Value;
+                }
+            }
+            catch (System.Exception) { }
+
+
+            /*Setting Url item*/
+            if (!String.IsNullOrEmpty(fieldFileUrl)) { urlField = fieldFileUrl; target = "_blank"; }
+
+            else if (!String.IsNullOrEmpty(fieldContentUrl))
+            {
+                urlField = Href("~/") + fieldContentUrl;
+                target = "_self";
+            }
+            else if (!String.IsNullOrEmpty(fieldLinkUrl)) { urlField = fieldLinkUrl; }
+
+
+
+}
+@tag.StartElement
+
+    <div class="col-xs-12 col-sm-2 col-md-4 col-lg-3">
+        @if (!String.IsNullOrEmpty(urlImage))
+        {
+            <a href="@urlField" title="Acessar" target="@target">
+                <img class="img-service" src="@Display.ResizeMediaUrl(Width: 80, Height: 80, Mode: "crop", Alignment: "middlecenter", Path: urlImage)" alt="@titleImage" />
+            </a>
+        }
+        else {
+            <a href="@urlField" title="Acessar" target="@target">
+                <span class="service-icon"><i class="fa fa-@iconName" aria-hidden="true"></i></span>
+            </a>
+        }
+    </div>
+    <div class="col-xs-12 col-sm-10 col-md-8 col-lg-9">
+        <h4 class="title-service"><a target=@target href="@urlField" title="@title">@title</a></h4>
+        <div>
+            @Html.Raw(description)
+        </div>
+
+        <div class="text-left learn-more learn-more-service" >
+            <a href="@urlField" title="Acessar" target="@target">  
+                <span>Acessar</span>
+                <i class="fa fa-angle-right" aria-hidden="true"></i>  
+            </a>
+        </div>
+    </div>
+
+    
+
+@tag.EndElement

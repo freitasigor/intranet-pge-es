@@ -1,0 +1,25 @@
+﻿@{
+    //Style.Include("default-grid.css");
+}
+<div class="orchard-layouts-root">
+    @Display(Model.LayoutRoot)
+
+@*
+    @using (Script.Foot())
+    {
+        <script type="text/javascript">
+            jQuery(document).ready(function ($) {
+                $(".dynamic-form .form-control").each(function () {
+                    if ($(this).attr('data-val-required')) {
+                        $(this).parent().find("label").append("<span>*</span>");
+                    } else {
+                        // href is blank
+                    }
+                });
+            });
+        </script>
+
+
+    }
+*@
+</div>

@@ -1,0 +1,114 @@
+﻿@using Orchard.ContentManagement
+
+@{
+    var userCanRegister = WorkContext.CurrentSite.As<Orchard.Users.Models.RegistrationSettingsPart>().UsersCanRegister;
+    var enableLostPassword = WorkContext.CurrentSite.As<Orchard.Users.Models.RegistrationSettingsPart>().EnableLostPassword;
+
+    string baseUrl = WorkContext.CurrentSite.BaseUrl;
+    string ambiente = "";
+    if (baseUrl.Contains(".des."))
+    {
+        ambiente = ".des";
+    }
+    else if(baseUrl.Contains(".dchm.")){
+        ambiente = ".dchm";
+    }
+
+}
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+
+
+        <div class="row" style="margin-bottom: 20px;">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-header">
+                <h2 class="title-content">@T((string)Model.Title)</h2>
+                <hr style="margin-top: 15px;" />
+            </div>
+        </div>
+
+
+        @if (ViewData.ModelState.Any(x => x.Value.Errors.Any()))
+        {
+            <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <div class="row">
+                    <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-9 col-md-offset-2 col-md-9 col-lg-offset-2 col-lg-9">
+                        @Html.ValidationSummary(T("Login was unsuccessful. Please correct the errors and try again.").ToString())
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="row" style="padding-top: 20px;padding-bottom: 20px;">
+            <div class="col-xs-offset-1 col-xs-10 col-sm-offset-1 col-sm-8 col-md-offset-1 col-md-8 col-lg-offset-1 col-lg-8">
+                @using (Html.BeginFormAntiForgeryPost(Url.Action("LogOn", new { ReturnUrl = Request.QueryString["ReturnUrl"] }), FormMethod.Post, new { @class = "dynamic-form form-horizontal" }))
+                {
+                <!-- Username -->
+                    <div class="form-group">
+                        <div class="row">
+                            <label for="userNameOrEmail" class="col-xs-12 col-sm-3 col-md-3 col-lg-3 control-label">@T("Username:")</label>
+                            <div class="col-xs-12 col-sm-9 col-md-9 col-lg-9">
+                                @Html.TextBox("userNameOrEmail", "", new { id = "username-email", @class = "form-control", autofocus = "autofocus" })
+                                @Html.ValidationMessage("userNameOrEmail")
+                            </div>
+                        </div>
+                    </div>
+                <!-- Password -->
+                    <div class="form-group">
+                        <div class="row">
+                            <label for="password" class="col-xs-12 col-sm-3 col-md-3 col-lg-3 control-label">@T("Password:")</label>
+                            <div class="col-xs-12 col-sm-9 col-md-9 col-lg-9">
+                                @Html.Password("password", string.Empty, new { @class = "form-control text" })
+                                @Html.ValidationMessage("password")
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-offset-3 col-sm-9 col-md-offset-3 col-md-9 col-lg-offset-3 col-lg-9">
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBox("rememberMe", new { id = "remember-me" })
+                                        @T("Remember me")
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-offset-3 col-sm-9 col-md-offset-3 col-md-9 col-lg-offset-3 col-lg-9">
+                                <button title="@T("Login")" style="width: 100%;margin-bottom: 2px;" type="submit" class="btn btn-primary btn-principal btn-read-more">@T("Login")</button>
+                                <span style="float: right;margin-top: 10px;">
+                                    @if (enableLostPassword)
+                                    {
+
+                                        <text> </text> @Html.ActionLink(T("Lost your Password?").Text, "RequestLostPassword")
+                                    }
+                                    else
+                                    {
+                                        string urlLostPassword = "//sistemas"+@ambiente+ ".es.gov.br/prodest/autenticacao/WebForm/frmNovaSenha.aspx";
+                                        <a href="@urlLostPassword" target="_blank" title="Esqueceu a senha? Clique aqui.">Esqueceu a senha? Clique aqui.</a>
+
+                                    }
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                }
+                @if (userCanRegister)
+                {
+                    <hr />
+                    <div class="lregister">
+                        Don't have Account? @Html.ActionLink(T("Register").Text, "Register")<br />
+                        @if (enableLostPassword)
+                        { @Html.ActionLink(T("Lost your Password?").Text, "RequestLostPassword") }
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</div>

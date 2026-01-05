@@ -1,0 +1,47 @@
+@using Orchard.ContentManagement;
+@using Orchard.Utility.Extensions;
+@{
+
+    /*Para o correto funcionamento do Slider é nessecesario definir um valor para o Model.Id e
+ * adicionar a classe 'slider' e 'rp-carousel' ao Model.Classes*/
+    Model.Id = "slider-" + Model.ContentItem.Id;
+    Model.Classes.Add("slider");
+    Model.Classes.Add("rp-carousel");
+
+    var tag = Tag(Model, "div");
+    tag.AddCssClass("row");
+    var list = Model.ContentItems;
+
+    
+
+    IEnumerable<object> enumContentItens = list;
+    var quantItemList = enumContentItens.Count();
+
+    var index = 0;
+
+    @tag.StartElement
+
+    <div class="col-lg-12 list-thumb-row">
+        <div id="carousel-@Model.Id" class="carousel slide crsl-items content-items-wrapper rp-carousel-news" data-navigation="@Model.ContentItem.Id" data-carousel="true" data-speed="400" data-visible="2" data-autorotate="15000">
+
+            <!-- Wrapper for slides -->
+            <div class="crsl-wrap row content-wrapper items-wrapper">
+                @foreach (var item in list)
+                {
+                    var attr = "";
+                    if (index == 0) { attr += "first active"; }
+                    <div class="crsl-item col-xs-12 col-sm-12 col-md-6 col-lg-6 @attr"> 
+                        @Display(BuildDisplay(item, "SummaryNoticiaGroup"))
+                    </div>
+                    index++;
+                }
+            </div>
+
+        </div>
+
+    </div>
+
+    @tag.EndElement
+    <!--/main slider carousel-->
+
+}

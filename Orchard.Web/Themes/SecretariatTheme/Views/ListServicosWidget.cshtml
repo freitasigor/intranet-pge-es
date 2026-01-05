@@ -1,0 +1,93 @@
+@using Orchard.Taxonomies.Models;
+@using Orchard.ContentManagement;
+@using Orchard.Utility.Extensions;
+@using Orchard.Mvc.Html;
+@using System.Linq;
+@{
+    Model.Id = "servicos-" + Model.ContentItem.Id;
+    var tag = Tag(Model, "div");
+    tag.AddCssClass("row-servicos");
+    var list = Model.ContentItems;
+    var contentManager = Model.ContentItem.ContentManager;
+    var index = 0;
+    bool openList = false;
+    dynamic allServices = null;
+    
+}
+
+@{
+
+
+    try
+    {
+        Dictionary<int, Orchard.Taxonomies.Models.TermPart> modalidadeTerms = new Dictionary<int, Orchard.Taxonomies.Models.TermPart>();
+        var modalidadeQuery = contentManager.HqlQuery().ForType("TipodeServicoTerm").ForVersion(VersionOptions.Published);
+        var listModalidadeQuery = modalidadeQuery.List();
+
+        foreach (var termQuery in listModalidadeQuery)
+        {
+            var termItem = ((IContent)termQuery).As<TermPart>();
+
+            if (termItem.Count > 0 || termItem.Selectable == false)
+            {
+                modalidadeTerms[termItem.Id] = termItem;
+            }
+
+        }
+
+        if(modalidadeTerms.Count > 0){
+
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 " >
+
+                    <table class="table table-bordered list-services">
+                        <tbody>
+
+                            @foreach (KeyValuePair<int, Orchard.Taxonomies.Models.TermPart> term in modalidadeTerms.OrderByDescending(i => i.Value.Container.Id))
+                            {
+                                if (term.Value.Container.Id != term.Value.TaxonomyId)
+                                {
+                                    var attr = "position-left";
+
+                                    if (index == 0)
+                                    {
+                                        @Html.Raw("<tr>")
+                                        openList = true;
+                                    }
+                                    else if (index == Model.ContentItem.ProjectionPart.Record.Items)
+                                    {
+                                        break;
+                                    }
+                                    else if (index % 2 == 0)
+                                    {
+                                        @Html.Raw("</tr>")
+                                        @Html.Raw("<tr>")
+                                    }
+
+                                    if (index % 2 != 0)
+                                    {
+                                        attr = "position-right";
+                                    }
+
+                                    <th class="service-item @attr">
+                                        @Display(BuildDisplay(term.Value.ContentItem, "SummaryCategoryService"))
+                                    </th>
+                                    index++;
+
+                                }
+                            }
+                            @if (openList)
+                            {
+                                @Html.Raw("</tr>")
+                            }
+
+                    </table>
+
+                </div>
+            </div> 
+ 
+        }
+
+    }
+    catch (System.Exception ex) { }
+}

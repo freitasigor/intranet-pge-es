@@ -1,0 +1,153 @@
+﻿
+@functions {
+    // To support the layout classifaction below. Implementing as a razor function because we can, could otherwise be a Func<string[], string, string> in the code block following.
+    string CalcuClassify(string[] zoneNames, string classNamePrefix)
+    {
+        var zoneCounter = 0;
+        var zoneNumsFilled = string.Join("", zoneNames.Select(zoneName => { ++zoneCounter; return Model[zoneName] != null ? zoneCounter.ToString() : ""; }).ToArray());
+        return HasText(zoneNumsFilled) ? classNamePrefix + zoneNumsFilled : "";
+    }
+}
+@{
+
+    /* Global includes for the theme
+    ***************************************************************/
+
+    SetMeta("charset", "utf-8");
+    SetMeta(httpEquiv: "X-UA-Compatible", content: "IE=edge,chrome=1");
+    SetMeta("viewport", "width=device-width, initial-scale=1.0");
+    SetMeta(httpEquiv: "Content-Language", content: "pt-br, pt, en");
+    SetMeta("author", "PRODEST");
+
+    /*Custom Meta*/
+    SetMeta("reply-to", "atendimento@prodest.es.gov.br");
+    SetMeta("description", "Aplicativo criado para o cidadão capixaba informar irregularidades ou sugestões, e assim participar da administração pública do Estado do Espírito Santo.");
+    SetMeta("keywords", "SECONT, Fiscal Cidadão, administração pública, fiscal, cidadão, sugestões, PRODEST, governo, Estado do Espírito Santo");
+
+    /* begin Styles
+    **************************************/
+
+    Style.Include("//cdn.es.gov.br/fonts/open-sans/1.0.0/css/open-sans.min.css").AtHead().SetAttribute("data-timestamped", "true");
+    Style.Include("bootstrap.min.css").UseCondition("!IE").AtHead().SetAttribute("data-timestamped", "true");/*Not IE*/
+    Style.Include("bootstrap-ie/ie/css/bootstrap-ie.min.css").UseCondition("gte IE 8").AtHead().SetAttribute("data-timestamped", "true");/*Bootstrap IE8+*/
+    Style.Include("bootstrap-ie/ie7/css/bootstrap-ie7.min.css").UseCondition("lt IE 8").AtHead().SetAttribute("data-timestamped", "true");/*Bootstrap IE7*/
+    Style.Include("bootstrap-ie/ie7/css/bootstrap-ie7-responsive.min.css").UseCondition("lt IE 8").AtHead().SetAttribute("data-timestamped", "true");/*Bootstrap Responsive IE7*/
+    Style.Include("fiscal-cidadao/fonts/geometos-rounded/1.0.0/css/geometos-rounded.css");
+    Style.Include("fiscal-cidadao/ie6.css").UseCondition("lt IE 7").AtHead().SetAttribute("data-timestamped", "true");/*IE6*/
+    Style.Include("fiscal-cidadao/main-fiscal-cidadao.css").AtHead().SetAttribute("data-timestamped", "true");
+    /* end Styles
+    ***************************************/
+
+    /* begin Scripts
+    **************************************/
+    Script.Require("jQuery").AtFoot();
+    Script.Include("//cdn.es.gov.br/bootstrap/3.3.2/js/bootstrap.min.js").AtFoot();
+
+    /* end Scripts
+    ***************************************/
+
+
+    /* Some useful shortcuts or settings
+    ***************************************************************/
+
+    Func<dynamic, dynamic> Zone = x => Display(x); // Zone as an alias for Display to help make it obvious when we're displaying zones
+
+
+
+    /* Last bit of code to prep the layout wrapper
+    ***************************************************************/
+    Model.Id = "layout-wrapper";
+    var tag = Tag(Model, "div"); // using Tag so the layout div gets the classes, id and other attributes added to the Model
+
+}
+
+@tag.StartElement
+
+
+<div class="container-fluid landing-header">
+    <div class="container">
+        <div class="row">
+            <div class="span4 col-xs-12 col-sm-4 col-md-offset-1 col-md-4 col-lg-offset-1 col-lg-4">
+                <div class="thumbnail">
+                    <img class="logo-fiscal-cidadao" src="@Url.Content(Html.ThemePath(WorkContext.CurrentTheme, "/Content/fiscal-cidadao/logo.png"))" alt="Logo Fiscal Cidadão" />
+                </div>
+            </div>
+            <div class="span3 col-xs-12 col-sm-4 col-md-3 col-lg-3">
+                <div class="span12 col-xs-12 col-sm-12 col-md-12 col-lg-12 content-title">
+                    <h3 class="title">
+                        Você fala, <br /> o Governo<br /> escuta e, <br />juntos,<br /> fazemos um<br /> Espírito Santo<br /> melhor para<br /> todos.
+                    </h3>
+                </div>
+            </div>
+            <div class="span4 col-xs-12 col-sm-4 col-md-4 col-lg-4">
+                <div class="thumbnail">
+                    <a title="Acessar portal do Governo do Estado do Espírito Santo" href="http://www.es.gov.br/" target="_blank">
+                        <img class="logo-governo" width="220" src="//cdn.es.gov.br/images/logo/governo/secom/Brasao_Governo_vertical_white_default.png" alt="Logo Governo do Estado do Espírito Santo">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid wrapper">
+    <div class="container">
+        <div class="row content">
+            <div class="span10 col-xs-12 col-sm-12 col-md-offset-1 col-md-10 col-lg-offset-1 col-lg-10 text-centertext-center">
+                <iframe src="https://www.youtube.com/embed/Bnj-8sG51-I" frameborder="0" style="width:100%;border: 3px solid black;" allowfullscreen></iframe>
+            </div>
+        </div>
+        <div class="row">
+            <div class="span6 col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-3 col-md-6 col-lg-offset-3 col-lg-6">
+                <div class="col-xs-12 col-sm-12 col-md-offset-1 col-md-10 col-lg-offset-1 col-lg-10 text-center">
+                    <h4 style="line-height:1.5em;font-size: 19px;margin-bottom: 20px;">
+                        Baixe o aplicativo, informe <br />
+                        as irregularidades ou sugestões e <br />
+                        participe da administração pública.
+                    </h4>
+                    <a class="btn-store" href="https://play.google.com/store/apps/details?id=br.gov.es.secont.ouvidoria" title="Acessar Google Play" style="text-decoration:none;">
+                        <img style="width: 145px;" src="@Url.Content(Html.ThemePath(WorkContext.CurrentTheme, "/Content/fiscal-cidadao/google_play.png"))" alt="Logo Fiscal Cidadão" />
+                    </a>
+                    <a class="btn-store" href="https://itunes.apple.com/br/app/fiscal-cidadao-es/id1033321104" title="Acessar App Store" style="text-decoration:none;">
+                        <img style="width: 165px;" src="@Url.Content(Html.ThemePath(WorkContext.CurrentTheme, "/Content/fiscal-cidadao/apple_store.png"))" alt="Logo Fiscal Cidadão" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@* the model content for the page is in the Content zone @ the default position (nothing, zero, zilch) *@
+@if (Model.Content != null
+                    && @HttpContext.Current.Request.RequestContext.RouteData.Values["controller"].ToString() == "Account"
+                    && @HttpContext.Current.Request.RequestContext.RouteData.Values["action"].ToString() == "AccessDenied")
+{
+    <div id="content" class="group">
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-body login-user">
+                        @Zone(Model.Content)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    using (Script.Foot())
+    {
+        <script>
+    $(document).ready(function() {
+
+        $('#myModal').modal('show')
+
+    });
+        </script>
+    }
+
+}
+
+@tag.EndElement

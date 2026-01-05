@@ -1,0 +1,61 @@
+﻿@using Orchard.Utility.Extensions;
+@{ 
+    var contentTypeClassName = ((string)Model.ContentItem.ContentType).HtmlClassify();
+    Model.List.Classes.Add(contentTypeClassName);
+    Model.List.Classes.Add("panel-group panel-group-downloads no-border");
+    Model.List.ItemClasses.Add("panel");
+    Model.List.Attributes.Add("id", "accordion-" + contentTypeClassName);
+    var panelActive = false;
+    int qtdContents = Model.ContentPart.ItemCount;
+    if (qtdContents == 1)
+    {
+        panelActive = true;
+    }
+
+}
+
+@if (qtdContents > 0 && Model.ContentPart.Record.Paginated == false)
+{
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <!-- begin Filtro Licitacoes-->
+            <div class="filter-licitacao filter-files">
+                <div id="filter-content">
+                    <div class="row">
+                        <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12 filter-group">
+                            <label>Palavra(s) a ser(em) pesquisada(s):</label>
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-10 col-md-10 col-lg-10" style="margin-bottom: 5px;">
+                                    <input class="form-control" type="text" name="palavrachave" value="" />
+                                </div>
+                                <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                                    <button class="btn btn-default submit filter-submit"
+                                            data-filter=".filter-files"
+                                            data-content-container=".row-files"
+                                            data-content-item=".panel"
+                                            data-panel-active="@panelActive.ToString().ToLower()"
+                                            data-enable-paging="true">
+                                        Pesquisar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end Filtro Licitacoes-->
+            <div id="loading-image"></div>
+        </div>
+    </div>
+}
+
+<div class="row row-files">
+    <div class="col-lg-12">
+        @Display(Model.List)
+        @Display(Model.Pager)
+    </div>
+</div>
+<ul data-container="accordion-galeriade-arquivos" class="pager filter-pagination ocult"></ul>
+
+
+

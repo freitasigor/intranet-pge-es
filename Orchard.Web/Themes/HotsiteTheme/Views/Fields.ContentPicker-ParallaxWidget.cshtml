@@ -1,0 +1,21 @@
+﻿@using Orchard.ContentPicker.Fields
+@using Orchard.Utility.Extensions;
+
+@{
+    var field = (ContentPickerField) Model.ContentField;
+    string name = field.DisplayName;
+    var contentItems = field.ContentItems;
+}
+<div class="content-picker-field content-picker-field-@name.HtmlClassify()">
+    @if(contentItems.Any()) {
+        foreach(var contentItem in contentItems) {
+
+            @Display(BuildDisplay(contentItem, "DetailParallax"))
+
+        }
+    }
+    else {
+        <span class="value">@T("No content items.")</span>
+    }
+</div>
+

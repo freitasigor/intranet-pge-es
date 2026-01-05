@@ -1,0 +1,11 @@
+﻿@using Orchard.UI.Resources
+@{
+    var resourceManager = WorkContext.Resolve<IResourceManager>();
+    var metas = resourceManager
+        .GetRegisteredMetas()
+        .Where(meta => string.IsNullOrWhiteSpace(meta.Name) || !meta.Name.Equals("generator"));
+
+    foreach(var meta in metas) {
+        <text>@Html.Raw(meta.GetTag())</text>
+    }
+}

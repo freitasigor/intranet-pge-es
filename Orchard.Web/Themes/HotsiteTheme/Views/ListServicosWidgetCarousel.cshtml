@@ -1,0 +1,44 @@
+@using Orchard.Taxonomies.Models;
+@using Orchard.ContentManagement;
+@using Orchard.Utility.Extensions;
+@using Orchard.Mvc.Html;
+@using System.Linq;
+@{
+
+    /*Para o correto funcionamento do Slider é nessecesario definir um valor para o Model.Id e
+ * adicionar a classe 'slider' e 'rp-carousel' ao Model.Classes*/
+    Model.Id = "slider-" + Model.ContentItem.Id;
+    Model.Classes.Add("slider");
+    Model.Classes.Add("rp-carousel");
+
+    var tag = Tag(Model, "div");
+    tag.AddCssClass("row");
+    tag.AddCssClass("row-servicos");
+    var list = Model.ContentItems;
+    var contentManager = Model.ContentItem.ContentManager;
+    var index = 0;
+    var totalItems = 0;
+}
+
+
+@tag.StartElement
+
+    @try
+    {
+
+        <div class="owl-carousel owl-carousel-news owl-theme" data-items-perpage="4">
+
+            @foreach (var item in list)
+            { 
+                @Display(BuildDisplay(item, "SummaryCarousel"))
+                totalItems += 1;
+
+            }
+            
+        </div>
+        <input type="hidden" name="total-items" value="@totalItems" />
+
+    }
+    catch (System.Exception ex) { }
+@tag.EndElement
+

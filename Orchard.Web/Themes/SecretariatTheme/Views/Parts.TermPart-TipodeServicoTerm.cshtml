@@ -1,0 +1,78 @@
+﻿@using Orchard.ContentManagement;
+@*
+    This shape displays a term and all content items associated to it.
+    - ContentItems is a List shape
+    - Pager is a Pager shape
+    - Taxonomy is the parent taxonomy
+    - ContentPart is the TermPart displayed
+*@
+
+@{
+    Model.ContentItems.Classes.Add("content-items");
+    var index = 0;
+}
+
+@foreach (var content in Model.ContentItems.Items)
+{
+
+    string attr = "";
+    string imageUrl = "";
+    string icon = "";
+
+    if (index == 0) { attr = "first"; }
+
+    @* Image URL*@
+    try
+    {
+
+        if (!String.IsNullOrEmpty(content.ContentItem.ImagemPart.ImagemdeDestaque.FirstMediaUrl))
+        {
+            imageUrl = content.ContentItem.ImagemPart.ImagemdeDestaque.FirstMediaUrl;
+        }
+
+    }
+    catch (System.Exception ex) { }
+
+    @* Icon*@
+    try
+    {
+
+
+        if (!String.IsNullOrEmpty(Model.ContentItem.TipodeServicoTerm.Icone.Value))
+        {
+            icon = "icon-" + Model.ContentItem.TipodeServicoTerm.Icone.Value;
+        }
+
+    }
+    catch (System.Exception ex) { }
+
+
+    <div class="row item-category-service @attr">
+
+        <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+            
+                @if (!String.IsNullOrEmpty(imageUrl))
+                {
+                    <div class="logo-service" title="Acessar Serviço">
+                        <div class="image-service">
+                            <img src="@Display.ResizeMediaUrl(Width: 165, Height: 117, Mode: "crop", Alignment: "middlecenter", Path: imageUrl)" alt="logo do serviço">
+                        </div>
+                    </div>
+                }
+                else if (!String.IsNullOrEmpty(icon))
+                {
+                    <div class="logo-service logo-icon" title="Acessar Serviço">
+                        <i class="prodesticons @icon"></i>
+                    </div>
+                }
+            
+        </div>
+        <div class="col-xs-12 col-sm-9 col-md-9 col-lg-9 content-col contain-image">
+            @Display(BuildDisplay(content.ContentItem, "SummaryService"))
+        </div>
+
+    </div>    
+     index++;
+}
+
+@Display(Model.Pager)

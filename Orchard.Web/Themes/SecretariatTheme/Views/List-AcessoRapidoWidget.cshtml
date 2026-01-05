@@ -1,0 +1,71 @@
+@{
+
+    var tag = Tag(Model, "div");
+    tag.AddCssClass("row");
+    var list = Model.Items;
+    var index = 0;
+
+    @tag.StartElement
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"> 
+        <ul class="list-items">
+            @foreach (var item in list)
+{
+    Orchard.ContentManagement.ContentItem contentItem = item.ContentItem;
+    var attr = "";
+    var title = "";
+    var urlField = "javascript:void(0);";
+    var fieldFileUrl = "";
+    var fieldContentUrl = "";
+    var fieldLinkUrl = "";
+    var target = "_self";
+
+    try
+    {
+        title = item.ContentItem.TitlePart.Title.ToString();
+    }
+    catch (System.Exception) { title = ""; }
+
+    foreach (var mediaPart in item.ContentItem.FilesPart.Arquivos.MediaParts)
+    {
+        fieldFileUrl = mediaPart.MediaUrl;
+    }
+    foreach (var contentitems in item.ContentItem.ContentPart.Conteudo.ContentItems)
+    {
+        fieldContentUrl = contentitems.AutoroutePart.DisplayAlias;
+    }
+
+    fieldLinkUrl = item.ContentItem.ExternalLinkPart.Link.Value;
+    if (!string.IsNullOrWhiteSpace(item.ContentItem.ExternalLinkPart.Link.Target))
+    {
+        target = item.ContentItem.ExternalLinkPart.Link.Target;
+    }
+    if (fieldFileUrl != "") { urlField = fieldFileUrl; target = "_blank"; }
+    else if (fieldContentUrl != "")
+    {
+        urlField = Href("~/") + fieldContentUrl;
+        target = "_self";
+    }
+    else if (fieldLinkUrl != "" && fieldLinkUrl != null) { urlField = fieldLinkUrl; }
+
+    try
+    {
+        if (index == 0) { attr += "first"; }
+
+
+        <li class="@attr">
+            <a class="btn-link btn-link-lg" href="@urlField" target="@target" title="@title"><span class="btn-float-left">@title</span> <i class="ion-ios-arrow-right"></i></a>
+        </li>
+        ++index;
+
+    }
+    catch (System.Exception ex) { ++index; }
+
+
+}
+        </ul>
+    </div>
+
+    @tag.EndElement
+
+}

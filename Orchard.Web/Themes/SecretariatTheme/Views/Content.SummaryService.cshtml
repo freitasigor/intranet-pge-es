@@ -1,0 +1,87 @@
+﻿@using Orchard.Utility.Extensions;
+@using Orchard.ContentManagement;
+@using Orchard.Mvc.Html;
+@using System.Linq;
+@{
+
+
+    var title = "";
+    var description = "";
+    var urlServico = "javascript:void(0);";
+    var target = "_self";
+
+    try
+    {
+
+        @* Title*@
+        if (!String.IsNullOrEmpty(Model.ContentItem.TitlePart.Title))
+        {
+            title = Model.ContentItem.TitlePart.Title;
+        }
+        @* Description*@
+        if (!String.IsNullOrEmpty(Model.ContentItem.Servico.Descricao.Value))
+        {
+            description = Model.ContentItem.Servico.Descricao.Value;
+        }
+
+    }
+    catch (System.Exception ex) { }
+
+    try
+    {
+
+        @* URL Slide*@
+        if (!String.IsNullOrEmpty(Model.ContentItem.Servico.Arquivo.FirstMediaUrl))
+        {
+            urlServico = Model.ContentItem.Servico.Arquivo.FirstMediaUrl;
+        }
+        else if (Model.ContentItem.Servico.Conteudo.ContentItems.Length > 0)
+        {
+            foreach (var contentitems in Model.ContentItem.Servico.Conteudo.ContentItems)
+            {
+                urlServico = Href("~/") + contentitems.AutoroutePart.DisplayAlias;
+            }
+        }
+        else if (!String.IsNullOrEmpty(Model.ContentItem.Servico.LinkExterno.Value))
+        {
+            urlServico = Model.ContentItem.Servico.LinkExterno.Value;
+        }
+
+        @* Target Slide*@
+        if (Model.ContentItem.Servico.AbriremNovaJanela.Value == "Sim")
+        {
+            target = "_blank";
+        }
+
+
+    }
+    catch (System.Exception ex) { } 
+
+
+}
+    <div class="row header-projection">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="metadata col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <h4 class="title-list" >
+                        <a target="@target" href="@urlServico" title="Acessar Serviço">
+                            @title
+                        </a>
+                    </h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="description-service">
+                <p>
+                    @description
+                </p>
+            </div>
+            <div>
+                <a class="btn btn-default" target="@target" href="@urlServico" title="Acessar Serviço">Acessar Serviço</a>
+            </div>
+        </div>
+    </div>
+

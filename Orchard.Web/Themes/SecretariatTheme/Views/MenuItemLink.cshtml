@@ -1,0 +1,26 @@
+﻿@{
+    string status = "";
+    if (Model.Item.Selected)
+    {
+        status = "active";
+    }
+    var target = "";
+    try
+    {
+        if ((dynamic)Model.Content.ContentItem.MenuItem.AbriremNovaJanela.Value)
+        {
+            target = "target=_blank";
+        }
+    }
+    catch
+    {
+        
+    }
+
+    if (String.IsNullOrEmpty(Model.Href) || Model.Href == "#")
+    {
+        Model.Href = "javascript:void(0)";
+    }
+
+}
+<a class="@status" @target href="@Model.Href"><span>@Model.Text</span></a><span class="divisor"></span>

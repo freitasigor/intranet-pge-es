@@ -1,0 +1,54 @@
+﻿@using Orchard.Utility.Extensions;
+@{
+    if (Model.Title != null)
+    {
+        Layout.Title = Model.Title;
+    }
+
+    Model.Classes.Add("content-item");
+    Model.Classes.Add("container-fluid");
+
+    var contentTypeClassName = ((string)Model.ContentItem.ContentType).HtmlClassify();
+    Model.Classes.Add(contentTypeClassName);
+
+    var tag = Tag(Model, "article");
+}
+
+@tag.StartElement
+<div class="container section-content">
+    <div class="row">
+        <div class="span-10 col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 col-lg-10 col-lg-offset-1">
+
+            <header class="row section-header">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">
+
+                    @Display(Model.Header)
+
+                    @if (Model.Meta != null)
+                    {
+                        <div class="metadata section-subtitle">
+                            @Display(Model.Meta)
+                        </div>
+                    }
+
+                </div>
+            </header>
+
+
+            <div class="row content-container">
+                <div class="span-12 col-xs-12 col-md-12 col-sm-12 col-lg-12">
+                    @Display(Model.Content)
+                </div>
+            </div>
+            @if (Model.Footer != null)
+            {
+                <footer>
+                    @Display(Model.Footer)
+                </footer>
+            }
+
+        </div>
+    </div>
+</div>
+
+@tag.EndElement

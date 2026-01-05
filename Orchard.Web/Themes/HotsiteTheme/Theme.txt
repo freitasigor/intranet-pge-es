@@ -1,0 +1,9 @@
+Name: HotsiteTheme
+Author: Prodest Team
+Website: http://www.prodest.es.gov.br/
+Description: Hotsite Theme for marketing
+Version: 0.0.26
+BaseTheme: SecretariatTheme
+# todo: provide tags
+# Tags: Classic, Serif
+Zones: HeaderGov, Header, MobileMenuHeader, Navigation, Search, BeforeMain, Featured, AsideFirst, Messages, BeforeContent, Content, AfterContent, AfterMain, Footer, FooterQuadFirst, FooterQuadSecond, Analytics

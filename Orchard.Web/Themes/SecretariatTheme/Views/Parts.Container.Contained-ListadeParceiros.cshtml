@@ -1,0 +1,57 @@
+﻿@*
+@Display(Model.List)
+
+@Display(Model.Pager)
+*@
+
+@using Orchard.Utility.Extensions;
+@{
+    var contentTypeClassName = ((string)Model.ContentItem.ContentType).HtmlClassify();
+    Model.List.Classes.Add(contentTypeClassName);
+
+}
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <div class="@contentTypeClassName table-responsive">
+
+            <table class="table table-bordered table-striped table-hover table-downloads">
+                <thead class="table-header-bg-color-background-color table-header-font-color-color">
+                    <tr>
+                        <th></th>
+                        <th class="coluna-5"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @try
+                    {
+                        foreach (var content in Model.List.Items)
+                        {
+                            var targetOpt = "_self";
+                            if (content.ContentItem.Parceiro.AbriremNovaJanela.Value)
+                            {
+                                targetOpt = "_blank";
+                            }
+                            <tr>
+                                <th>
+                                    <a target=@targetOpt href="@content.ContentItem.Parceiro.Url.Value" title="Acessar: @content.ContentItem.TitlePart.Title">@content.ContentItem.TitlePart.Title</a>
+                                </th>
+                                <th class="coluna-5 text-center">
+                                    <button onclick="window.open('@content.ContentItem.Parceiro.Url.Value','@targetOpt');" type="button" class="btn btn-default" title="Acessar: @content.ContentItem.TitlePart.Title">
+                                        Acessar
+                                    </button>
+                                </th>
+                            </tr>
+                        }
+                    }
+                    catch (System.Exception ex) { }
+
+                </tbody>
+            </table>
+
+        </div>
+
+        @Display(Model.Pager)
+    </div>
+</div>

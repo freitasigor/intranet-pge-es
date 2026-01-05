@@ -1,0 +1,163 @@
+﻿@using Orchard.ContentManagement;
+@using Orchard.Core.Contents;
+@{
+    var tag = Tag(Model, "div");
+    tag.AddCssClass("row");
+    var list = Model.Items;
+
+    IEnumerable<object> enumContentItens = list;
+    var quantItemList = enumContentItens.Count();
+
+    var attr = "";
+    var urlWidget = "javascript:void(0);";
+    var fieldFileUrl = "";
+    var fieldContentUrl = "";
+    var fieldLinkUrl = "";
+    var target = "_self";
+    bool buttonWidget = false;
+    var buttonText = "Acessar";
+    var backgroundColor = "";
+    var classContent = "";
+
+    /*background color*/
+    try
+    {
+        if (Model.ContentItem.BackgroundColorPart.BackgroundColor.Value.ToLower() != "nenhuma")
+        {
+            backgroundColor = "bg-color-element bg-color-" + Model.ContentItem.BackgroundColorPart.BackgroundColor.Value.ToLower();
+            tag.AddCssClass(backgroundColor);
+        }
+    }catch { }
+    /*File URL*/
+    try
+    {
+        if (Model.ContentItem.FilesPart.Arquivos.FirstMediaUrl)
+        {
+            fieldFileUrl = Model.ContentItem.FilesPart.Arquivos.FirstMediaUrl;
+        }
+    }catch { }
+    /*Content URL*/
+    try
+    {
+        foreach (var contentitems in Model.ContentItem.ContentPart.Conteudo.ContentItems)
+        {
+            fieldContentUrl = contentitems.AutoroutePart.DisplayAlias;
+        }
+    }
+    catch { }
+    /*Link URL*/
+    try
+    {
+        if (!String.IsNullOrEmpty(Model.ContentItem.DefaultWidget.LinkExterno.Value))
+        {
+            fieldLinkUrl = Model.ContentItem.DefaultWidget.LinkExterno.Value;
+        }
+    }
+    catch { }
+    /*Target option*/
+    try
+    {
+        if (Model.ContentItem.DefaultWidget.AbriremNovaJanela.Value == "Sim")
+        {
+            target = "_blank";
+        }
+    }
+    catch { }
+
+    /*Set button*/
+    try
+    {
+        if (Model.ContentItem.DefaultWidget.Habilitarbotao.Value == "Sim")
+        {
+            buttonWidget = true;
+            if (!String.IsNullOrEmpty(Model.ContentItem.DefaultWidget.TextodoBotao.Value))
+            {
+                buttonText = Model.ContentItem.DefaultWidget.TextodoBotao.Value;
+            }
+        }
+
+    }
+    catch { }
+
+    /*Set Url Widget*/
+    if (!String.IsNullOrEmpty(fieldFileUrl)) { urlWidget = fieldFileUrl; target = "_blank"; }
+    else if (fieldContentUrl != "")
+    {
+        urlWidget = Href("~/") + fieldContentUrl;
+        target = "_self";
+    }
+    else if (fieldLinkUrl != "" && fieldLinkUrl != null) { urlWidget = fieldLinkUrl; }
+
+
+
+    var contentItem = (ContentItem)Model.ContentItem;
+    var authorizedFor = AuthorizedFor(Permissions.EditContent, contentItem);
+
+if(authorizedFor && Model.ContentItem.Id > 0)
+{
+        @Html.Raw("<div class=\"content-control\">");
+        <div class="manage-actions">@Html.ItemEditLinkWithReturnUrl(T("Editar").Text, contentItem)</div>
+}
+
+    /*Display*/
+    @tag.StartElement
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 default-widget">
+            @if (!buttonWidget) {
+                @Html.Raw("<a href=\""+urlWidget+"\" class=\"link-color-color\" target=\""+target+"\" title=\"Acessar: "+Model.ContentItem.WidgetPart.Title+"\">")
+            }
+            <div class="thumbnail effect-6">
+                <div class="img">
+                    @foreach(var content in Model.ContentItem.ImagemPart.ImagemdeDestaque.MediaParts){
+                        @Display(Model.ContentItem.ContentManager.BuildDisplay(content, "SummaryImagemdeDestaqueSlide"))
+                    }
+                    @*
+                        <div class="bg-img-content" style="background-image: url(@Display.ResizeMediaUrl(Width: 810, Height: 360, Mode: "crop", Alignment: "middlecenter", Path: Model.ContentItem.ImagemPart.ImagemdeDestaque.FirstMediaUrl))"></div>
+                    *@
+                    <div class="overlay" onclick="window.open('@urlWidget','@target')">
+                        <a href="@urlWidget" target="@target" class="mybutton expand" title="@buttonText">@buttonText</a>
+                        <a class="close-overlay hidden">x</a>
+                    </div>
+                </div>
+            </div>
+            @*Button in image when not content*@
+            @if (String.IsNullOrEmpty(Model.ContentItem.BodyPart.Text))
+            {
+                if (buttonWidget)
+                {
+                    <div class="thumbnail-btn">
+                        <button title="@buttonText" type="button" onclick="window.open('@urlWidget','@target')" class="btn btn-default">
+                            <span>@buttonText </span><i class="ion-ios-arrow-right"></i>
+                        </button>
+                    </div>
+                }
+                classContent += " not-content";
+            }                
+            <div class="content-default-widget @classContent">
+                @if (!String.IsNullOrEmpty(Model.ContentItem.BodyPart.Text))
+                {
+                    @Html.Raw(Model.ContentItem.BodyPart.Text)
+                }
+                @*Button in image when exist content*@
+                @if(buttonWidget) {
+                    <div class="text-right">
+                        <button title="@buttonText" type="button" onclick="window.open('@urlWidget','@target')" class="btn btn-default">
+                            <span>@buttonText </span><i class="ion-ios-arrow-right"></i>
+                        </button>
+                    </div>  
+                }
+            </div>
+            @if (!buttonWidget)
+            {
+                @Html.Raw("</a>")
+            }
+        </div>
+    @tag.EndElement
+
+
+    if(authorizedFor && Model.ContentItem.Id > 0)
+    {
+        @Html.Raw("</div>");
+    }
+
+}
+

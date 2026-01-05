@@ -1,0 +1,16 @@
+﻿@{
+
+    var target = "";
+    try
+    {
+        if ((dynamic)Model.Content.ContentItem.MenuItem.AbriremNovaJanela.Value)
+        {
+            target = "target=_blank";
+        }
+    }
+    catch
+    {
+        
+    }
+}
+<a class="item-menu" @target href="@Model.Href" title="Acessar: @Model.Text"><span>@Model.Text</span></a><span class="divisor"></span>

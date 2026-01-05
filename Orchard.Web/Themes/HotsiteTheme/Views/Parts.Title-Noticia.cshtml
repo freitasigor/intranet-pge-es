@@ -1,0 +1,27 @@
+@{
+    Layout.Title = Model.Title;
+}
+
+<h2 class="title-content">@Model.Title</h2>
+<div class="row content-header">
+    <div class="col-lg-12">
+        <div class="published">
+            @if (!((DateTime?)Model.ContentItem.CommonPart.PublishedUtc).HasValue)
+            {
+            @T("Rascunho");
+            }
+            else if (Model.ContentItem.CommonPart.PublishedUtc.ToString("dd/MM/yyyy HH:mm") != Model.ContentItem.CommonPart.CreatedUtc.ToString("dd/MM/yyyy HH:mm"))
+            {
+
+            @Display.DateTime(DateTimeUtc: Model.ContentItem.CommonPart.CreatedUtc, CustomFormat: T("dd/MM/yyyy HH'h'mm"));
+            <span> - Atualizado em </span>
+            @Display.DateTime(DateTimeUtc: Model.ContentItem.CommonPart.PublishedUtc, CustomFormat: T("dd/MM/yyyy HH'h'mm"));
+            }
+            else
+            {
+            @Display.DateTime(DateTimeUtc: Model.ContentItem.CommonPart.CreatedUtc, CustomFormat: T("dd/MM/yyyy HH'h'mm"));
+            }
+        </div>
+    </div>
+</div>
+<div class="color-secondary-background-color separator text-center"></div>

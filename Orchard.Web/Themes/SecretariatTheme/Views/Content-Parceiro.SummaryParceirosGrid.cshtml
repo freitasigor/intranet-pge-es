@@ -1,0 +1,52 @@
+﻿@{ 
+   
+    var title = "";
+    var urlField = "javascript:void(0);";
+    var target = "_self";
+
+
+    try
+    {
+        title = Model.ContentItem.TitlePart.Title.ToString();
+    }
+    catch (System.Exception) { }
+
+    try
+    {
+
+        if (!String.IsNullOrEmpty(Model.ContentItem.Parceiro.Url.Value))
+        {
+            urlField = Model.ContentItem.Parceiro.Url.Value;
+        }
+
+        if (Model.ContentItem.Parceiro.AbriremNovaJanela.Value)
+        {
+            target = "_blank";
+        }
+    }
+    catch (System.Exception) { }
+
+    try
+    {
+
+    <div class="partners-item partners-item-grid">
+        <div class="thumbnail">
+            @if (!String.IsNullOrEmpty(Model.ContentItem.Parceiro.ImagemdeDestaque.FirstMediaUrl))
+            {
+                <a href="@urlField" target="@target" title="@title">
+                    <img src="@Display.ResizeMediaUrl(Width: 215, Height: 90, Mode: "pad", Alignment: "middlecenter", Path: Model.ContentItem.Parceiro.ImagemdeDestaque.FirstMediaUrl, PadColor: "white")" alt="Logomarca - @title" />
+                </a>
+
+            }
+        </div>
+        <div class="text-center">
+            <a href="@urlField" target="@target" title="@title">
+                @title
+            </a>
+
+        </div>
+    </div>        
+
+    }
+    catch (System.Exception ex) { }
+}

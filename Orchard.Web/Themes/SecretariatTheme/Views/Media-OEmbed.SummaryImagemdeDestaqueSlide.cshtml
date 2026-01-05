@@ -1,0 +1,91 @@
+﻿@using System;
+@using System.Text.RegularExpressions;
+@using JetBrains.Annotations;
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using System.Net;
+@using Orchard.ContentManagement;
+@using Orchard.Utility.Extensions;
+@using Orchard.MediaLibrary.Models
+@using Orchard.MediaLibrary.Fields;
+@using System.Linq;
+
+
+@{
+    MediaPart mediaPart = Model.ContentItem.MediaPart;
+    //Layout.Title = mediaPart.Title;
+    var contentTypeClassName = mediaPart.ContentItem.ContentType.HtmlClassify();
+
+    var content = Model.ContentItem;
+
+    Regex VimeoVideoRegex = new Regex(@"vimeo\.com/(?:channels\/|channels\/\w+\/|groups\/[^\/]*\/videos\/|album‌​\/\d+\/video\/|video\/|)?([0-9]+)", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+    Regex YoutubeVideoRegex = new Regex(@"youtu(?:\.be|be\.com)/(?:.*v(?:/|=)|(?:.*/)?)([a-zA-Z0-9-_]+)", RegexOptions.IgnoreCase);
+
+    var verticalPosition = "center";
+    var horizontalPosition = "center";
+    var alignment = "middlecenter";
+    var urlImage = "";
+    var urlEmbed = "";
+
+
+    // URL embed
+    try
+    {
+        if (!String.IsNullOrEmpty(content.OEmbedPart.Source.ToString())) { urlEmbed = content.OEmbedPart.Source.ToString(); }
+    }
+    catch (System.Exception) { }
+
+    // Url Image
+    try
+    {
+        if (!String.IsNullOrEmpty(urlEmbed))
+        {
+
+            Match youtubeMatch = YoutubeVideoRegex.Match(urlEmbed);
+            Match vimeoMatch = VimeoVideoRegex.Match(urlEmbed);
+
+            string id = string.Empty;
+
+            if (youtubeMatch.Success)
+            {
+                id = youtubeMatch.Groups[1].Value;
+                urlImage = "http://img.youtube.com/vi/" + id + "/hqdefault.jpg";
+            }
+
+            if (vimeoMatch.Success)
+            {
+                id = vimeoMatch.Groups[1].Value;
+                /* json treatment - begin*/
+                var json = "";
+                using (WebClient wc = new WebClient()) { json = wc.DownloadString("http://vimeo.com/api/v2/video/" + id + ".json"); }
+                dynamic jsonDeserialized = JsonConvert.DeserializeObject<dynamic>(json);
+                string jsonDeserializedString = ((Newtonsoft.Json.Linq.JContainer)jsonDeserialized).First.ToString();
+                dynamic jsonObj = JObject.Parse(jsonDeserializedString);
+                /* json treatment - end*/
+
+                urlImage = jsonObj.thumbnail_large.Value;
+            }
+
+            /*
+            Sizes Youtube image
+                http://img.youtube.com/vi/<insert-youtube-video-id-here>/default.jpg
+                http://img.youtube.com/vi/<insert-youtube-video-id-here>/hqdefault.jpg
+                http://img.youtube.com/vi/<insert-youtube-video-id-here>/mqdefault.jpg
+                http://img.youtube.com/vi/<insert-youtube-video-id-here>/sddefault.jpg
+                http://img.youtube.com/vi/<insert-youtube-video-id-here>/maxresdefault.jpg
+            */
+
+        }
+    }
+    catch (System.Exception) {}
+
+}
+
+@if (!String.IsNullOrEmpty(urlImage))
+{
+    var bgImageDefault = "background-image: url(\"" + Display.ResizeMediaUrl(Width: 780, Mode: "crop", Alignment: alignment, Path: urlImage) + "\");";
+
+<span class="bg-img-content"
+      style="@bgImageDefault background-position-y:@verticalPosition;background-position-x:@horizontalPosition;background-position:@horizontalPosition @verticalPosition;">
+</span>
+}

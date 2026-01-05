@@ -1,0 +1,125 @@
+﻿@using Orchard.Utility.Extensions;
+
+        @{
+
+            var title = "";
+            var urlField = "javascript:void(0);";
+            var fieldFileUrl = "";
+            var fieldContentUrl = "";
+            var fieldLinkUrl = "";
+            var target = "_self";
+
+
+            /*Title*/
+            try
+            {
+                title = Model.ContentItem.TitlePart.Title.ToString();
+            }
+            catch (System.Exception) { title = ""; }
+
+            /*File Url*/
+            try
+            {
+                foreach (var mediaPart in Model.ContentItem.FilesPart.Arquivos.MediaParts)
+                {
+                    fieldFileUrl = mediaPart.MediaUrl;
+                }
+            }
+            catch (System.Exception) { fieldFileUrl = ""; }
+
+            /*Content Url*/
+            try
+            {
+                foreach (var contentitems in Model.ContentItem.ContentPart.Conteudo.ContentItems)
+                {
+                    fieldContentUrl = contentitems.AutoroutePart.DisplayAlias;
+                }
+            }
+            catch (System.Exception) { fieldContentUrl = ""; }
+
+            /*Link Url*/
+            try
+            {
+                fieldLinkUrl = Model.ContentItem.Link.Url.Value;
+            }
+            catch (System.Exception) { fieldLinkUrl = ""; }
+
+            /*Target Url*/
+            try
+            {
+                if (Model.ContentItem.Link.AbriremNovaJanela.Value)
+                {
+                    target = "_blank";
+                }
+            }
+            catch (System.Exception) { target = "_self"; }
+
+
+
+
+            /*Setting Url item*/
+            if (!String.IsNullOrEmpty(fieldFileUrl)) { urlField = fieldFileUrl; target = "_blank"; }
+
+            else if (!String.IsNullOrEmpty(fieldContentUrl))
+            {
+                urlField = Href("~/") + fieldContentUrl;
+                target = "_self";
+            }
+            else if (!String.IsNullOrEmpty(fieldLinkUrl)) { urlField = fieldLinkUrl; }
+
+
+
+        }
+
+
+
+
+
+    <th>
+
+        <a target=@target href="@urlField" title="@Model.ContentItem.CommonPart.Container.ListadeLinks.TextodoBotao.Value : @title">@title</a>
+        @try
+        {
+            if (!String.IsNullOrEmpty(Model.ContentItem.ResumoPart.Resumo.Value))
+            {
+                <div class="caption">
+                    @Model.ContentItem.ResumoPart.Resumo.Value
+                </div>
+            }
+
+        }
+        catch (System.Exception)
+        {
+
+            try
+            {
+                if (!String.IsNullOrEmpty(Model.ContentItem.Link.Resumo.Value))
+                {
+                    <div class="caption">
+                        @Html.Raw(Model.ContentItem.Link.Resumo.Value)
+                    </div>
+                }
+            }
+            catch (System.Exception) { }
+
+        }
+
+
+    </th>
+
+    @try
+    {
+        if (!String.IsNullOrEmpty(Model.ContentItem.CommonPart.Container.ListadeLinks.TextodoBotao.Value))
+        {
+            <th class="coluna-5 text-center">
+                <button onclick="window.open('@urlField','@target');" type="button" class="btn btn-default" title="@Model.ContentItem.CommonPart.Container.ListadeLinks.TextodoBotao.Value : @title">
+                    @Model.ContentItem.CommonPart.Container.ListadeLinks.TextodoBotao.Value
+                </button>
+            </th>
+        }
+
+    }
+    catch (System.Exception) { }
+
+
+

@@ -1,0 +1,304 @@
+﻿@using Orchard.Utility.Extensions;
+@using Orchard.Services;
+@using Orchard.Localization;
+@using Orchard.Localization.Services;
+
+@{
+    if (Model.Title != null)
+    {
+        Layout.Title = Model.Title;
+    }
+
+    Model.Classes.Add("container-licitacoes");
+
+    var contentTypeClassName = ((string)Model.ContentModel.ContentItem.ContentType).HtmlClassify();
+    Model.Classes.Add(contentTypeClassName);
+
+    var tag = Tag(Model, "div");
+}
+@tag.StartElement
+
+
+    <div class="panel-group panel-group-downloads text-left list-licitacoes">
+
+        <div class="panel accordion-group item-licitacao">
+
+            <div class="panel-heading painel-ativo active" role="tab" id="heading-@Model.ContentItem.Id">
+                <a class="" data-toggle="collapse" href="#collapse-item-licitacao-@Model.ContentItem.Id" aria-expanded="true" aria-controls="collapse-item-licitacao-@Model.ContentItem.Id">
+                    <h5 class="panel-title">
+                        <span class="paneltitle-value">@Model.ContentItem.TitlePart.Title.ToString()</span>
+                        <i class="fa fa-plus fa-minus"></i>
+                    </h5>
+                    <span class="bottom-triangle active"></span>
+                </a>
+            </div>
+
+
+            <div id="collapse-item-licitacao-@Model.ContentItem.Id" class="panel-collapse accordion-body collapse in">
+                <div class="panel-body accordion-inner">
+                    <div class="content-item-licitacao">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    @if (!String.IsNullOrEmpty(Model.ContentItem.Licitacao.NumerodaLicitacao.Value))
+                                    {
+                                        <tr>
+                                            <td style="width: 15%;" class="title-row">
+                                                <strong>
+                                                    @Model.ContentItem.Licitacao.NumerodaLicitacao.DisplayName<span>:</span>
+                                                </strong>
+                                            </td>
+                                            <td colspan="5" align="left" scope="row">
+                                                <strong>
+                                                    <span class="numlicitacao-value">@Model.ContentItem.Licitacao.NumerodaLicitacao.Value</span>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    }
+
+                                    <tr>
+                                        <td style="width: 15%;" class="title-row">
+                                            <strong>
+                                                @Model.ContentItem.Licitacao.Objeto.DisplayName<span>:</span>
+                                            </strong>
+                                        </td>
+                                        <td colspan="5" align="left" scope="row">
+                                            @if (!String.IsNullOrEmpty(Model.ContentItem.Licitacao.Objeto.Value))
+                                            {
+                                                <span class="objeto-value">@Model.ContentItem.Licitacao.Objeto.Value</span>
+                                            }
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="title-row">
+                                            <strong>
+                                                @Model.ContentItem.Licitacao.Modalidade.DisplayName<span>:</span>
+                                            </strong>
+                                        </td>
+                                        <td align="left" scope="row" style="width: 21%;">
+                                            @if (Model.ContentItem.Licitacao.Modalidade.Terms.Count > 0)
+                                            {
+                                                <span class="modalidade-value">@Model.ContentItem.Licitacao.Modalidade.Terms[0].Name</span>
+                                            }
+                                        </td>
+
+                                        <td class="title-row" style="width: 14%;">
+                                            <strong>
+                                                @Model.ContentItem.Licitacao.Situacao.DisplayName<span>:</span>
+                                            </strong>
+                                        </td>
+                                        <td colspan="3" align="left" scope="row">
+                                            @if (Model.ContentItem.Licitacao.Situacao.Terms.Count > 0)
+                                            {
+                                                <span class="situacao-value">@Model.ContentItem.Licitacao.Situacao.Terms[0].Name</span>
+
+                                            }
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="title-row"><strong>@Model.ContentItem.Licitacao.DatadePublicacao.DisplayName<span>:</span></strong></td>
+                                        <td align="left" scope="row">
+                                            @if (((DateTime?)Model.ContentItem.Licitacao.DatadePublicacao.DateTime).HasValue)
+                                            {
+                                                //var DatadePublicacao = TimeZoneInfo.ConvertTimeFromUtc(Model.ContentItem.Licitacao.DatadePublicacao.DateTime, TimeZoneInfo.FindSystemTimeZoneById("Greenwich Standard Time"));
+                                                var DatadePublicacao = Model.ContentItem.Licitacao.DatadePublicacao.DateTime;
+                                                <span class="datapublicacao-value">@DatadePublicacao.ToString("dd/MM/yyyy")</span>
+                                            }
+                                        </td>
+
+                                        <td class="title-row"><strong>@Model.ContentItem.Licitacao.DatadeAbertura.DisplayName<span>:</span></strong></td>
+                                        <td align="left" scope="row" style="width: 10%;">
+                                            @if (((DateTime?)Model.ContentItem.Licitacao.DatadeAbertura.DateTime).HasValue)
+                                            {
+                                                var DatadeAbertura = Model.ContentItem.Licitacao.DatadeAbertura.DateTime;
+                                                //var DatadeAbertura = TimeZoneInfo.ConvertTimeFromUtc(Model.ContentItem.Licitacao.DatadeAbertura.DateTime, TimeZoneInfo.FindSystemTimeZoneById("Greenwich Standard Time"));
+                                                <span class="dataabertura-value">@DatadeAbertura.ToString("dd/MM/yyyy")</span>
+                                            }
+                                        </td>
+
+                                        <td class="title-row" style="width:14%;"><strong>@Model.ContentItem.Licitacao.HoradeAbertura.DisplayName<span>:</span></strong></td>
+                                        <td align="left" scope="row">
+                                            @if (((DateTime?)Model.ContentItem.Licitacao.HoradeAbertura.DateTime).HasValue)
+                                            {
+
+                                                try
+                                                {
+                                                    TimeZoneInfo timeZoneInfo;
+                                                    timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(WorkContext.CurrentTimeZone.Id);
+                                                    var horarioVerao = timeZoneInfo.IsDaylightSavingTime(DateTime.Now);
+                                                    var HoradeAbertura = new DateTime();
+                                                    if (horarioVerao)
+                                                    {
+                                                        HoradeAbertura = Model.ContentItem.Licitacao.HoradeAbertura.DateTime + @WorkContext.CurrentTimeZone.BaseUtcOffset + TimeSpan.FromHours(1);
+                                                    }
+                                                    else
+                                                    {
+                                                        HoradeAbertura = Model.ContentItem.Licitacao.HoradeAbertura.DateTime + @WorkContext.CurrentTimeZone.BaseUtcOffset;
+                                                    }
+                                                    <span class="horaabertura-value">@HoradeAbertura.ToString("HH:mm")</span>
+                                                }
+                                                catch (Exception e){
+
+                                                }
+
+                                                /*
+                                                var time = Display.DateTime(DateTimeUtc: Model.ContentItem.Licitacao.HoradeAbertura.DateTime, CustomFormat: T("HH:mm"));
+                                                <span class="horaabertura-value">@Display.DateTime(DateTimeUtc: Model.ContentItem.Licitacao.HoradeAbertura.DateTime, CustomFormat: T("HH:mm"))</span>
+                                                */
+                                            }
+
+
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td class="title-row">
+                                            <strong>
+                                                @Model.ContentItem.Licitacao.LocaldaLicitacao.DisplayName<span>:</span>
+                                            </strong>
+                                        </td>
+                                        <td colspan="5" align="left" scope="row">
+                                            @if (!String.IsNullOrEmpty(Model.ContentItem.Licitacao.LocaldaLicitacao.Value))
+                                            {
+                                                <span class="local-value">@Model.ContentItem.Licitacao.LocaldaLicitacao.Value</span>
+                                            }
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="title-row">
+                                            <strong>
+                                                @Model.ContentItem.Licitacao.Telefone.DisplayName<span>:</span>
+                                            </strong>
+                                        </td>
+                                        <td align="left" scope="row">
+                                            @if (!String.IsNullOrEmpty(Model.ContentItem.Licitacao.Telefone.Value))
+                                            {
+                                                <span class="telefone-value">@Model.ContentItem.Licitacao.Telefone.Value</span>
+                                            }
+                                        </td>
+
+                                        <td align="left" scope="row" class="title-row"><strong>@Model.ContentItem.Licitacao.Email.DisplayName<span>:</span></strong></td>
+                                        <td colspan="3" align="left" scope="row">
+                                            @if (!String.IsNullOrEmpty(Model.ContentItem.Licitacao.Email.Value))
+                                            {
+                                                <a title="Enviar mensagem de email para:  @Model.ContentItem.Licitacao.Email.Value" href="mailto:@Model.ContentItem.Licitacao.Email.Value"><span class="email-value">@Model.ContentItem.Licitacao.Email.Value</span></a>
+                                            }
+                                        </td>
+
+
+                                    </tr>
+                                    @if (!String.IsNullOrEmpty(Model.ContentItem.Licitacao.Observacao.Value))
+                                    {
+                                        <tr>
+                                            <td style="width: 15%;" class="title-row">
+                                                <strong>
+                                                    @Model.ContentItem.Licitacao.Observacao.DisplayName<span>:</span>
+                                                </strong>
+                                            </td>
+                                            <td colspan="5" align="left" scope="row">
+                                                <strong>
+                                                    <span class="observacao-value">@Model.ContentItem.Licitacao.Observacao.Value</span>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                        @try
+                        {
+
+
+                            if (!String.IsNullOrEmpty(Model.ContentItem.Licitacao.ArquivosParaDownload.FirstMediaUrl)) {
+
+                                <div class="panel-heading accordion-heading">
+                                    <div class="panel-title-downloads">
+                                        <a class="btn btn-default btn-download-licitacao" data-toggle="collapse" href="#collapse-download-@Model.ContentItem.Id" aria-expanded="false" aria-controls="collapse-download-@Model.ContentItem.Id">
+                                            <span class="see-files">Ver</span> <span class="hide-files">Ocultar</span> Arquivos para Baixar
+                                            <span class="bottom-triangle-default active"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div id="collapse-download-@Model.ContentItem.Id" class="panel-collapse accordion-body collapse">
+                                    <div class="panel-body accordion-inner">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover table-bordered table-downloads">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="description-header">
+                                                            ARQUIVO
+                                                            <span class="directional-sort">
+                                                                <i class="fa fa-caret-up"></i>
+                                                                <i class="fa fa-caret-down"></i>
+                                                            </span>
+                                                        </th>
+                                                        <th class="coluna-2 technical-data file-format-head">
+                                                            FORMATO
+                                                            <span class="directional-sort">
+                                                                <i class="fa fa-caret-up"></i>
+                                                                <i class="fa fa-caret-down"></i>
+                                                            </span>
+                                                        </th>
+                                                        <th class="coluna-4 technical-data file-size-head">
+                                                            TAMANHO
+                                                            <span class="directional-sort">
+                                                                <i class="fa fa-caret-up"></i>
+                                                                <i class="fa fa-caret-down"></i>
+                                                            </span>
+                                                        </th>
+                                                        <th class="coluna-5 technical-data file-action-head"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var media in Model.ContentItem.Licitacao.ArquivosParaDownload.MediaParts)
+                                                    {
+                                                        string[] typeArray = media.FileName.Split(new Char[] { '.' });
+                                                        string[] mimeTypeArray = media.MimeType.Split(new Char[] { '/', '.' });
+                                                        var tamKiloBytes = media.ContentItem.DocumentPart.Length / 1024;
+
+                                                        <tr>
+                                                            <td class="description">
+                                                                <a class="download-file" target="_blank" href="@media.MediaUrl" title="Baixar: @media.Title">@media.Title</a>
+                                                                @if (!String.IsNullOrEmpty(media.Caption.ToString()))
+                                                                {
+                                                                    <div class="caption">
+                                                                        @media.Caption
+                                                                    </div>
+                                                                }
+                                                            </td>
+                                                            <td class="coluna-3 technical-data file-format">
+                                                                <span title="@typeArray.Last()" class="icon-format icon-@typeArray.Last() @mimeTypeArray[0] @mimeTypeArray.Last()"></span>@typeArray.Last()
+                                                            </td>
+                                                            <td class="coluna-4 technical-data file-size">
+                                                                @tamKiloBytes kB
+                                                            </td>
+                                                            <td class="coluna-5 technical-data file-action">
+                                                                <button onclick="window.open('@media.MediaUrl', '_blank');" type="button" class="btn btn-default" title="Clique aqui para baixar: @media.Title">
+                                                                    Clique Aqui para Baixar
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div><!-- end .panel-body -->
+                                </div><!-- end .panel-collapse -->
+
+                            }
+                        }
+                        catch (System.Exception ex) { }
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+@tag.EndElement

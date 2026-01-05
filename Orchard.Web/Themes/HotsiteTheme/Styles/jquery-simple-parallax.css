@@ -1,0 +1,68 @@
+﻿body{
+     font-family: "Open Sans", sans-serif; 
+}
+
+.divider {
+    height:50px;
+}
+
+section {
+    overflow:auto;
+    width: 100%;
+}
+
+.container-section.slider{
+    min-height: 800px;
+    padding-top:50px;
+    padding-bottom:50px;
+    width: 100%;
+}
+
+.section-content{
+    padding-top: 80px;
+    padding-bottom: 100px;
+    position: relative;
+    overflow: hidden;
+}
+
+.bg-1 {
+    background: url('../Content/Images/Pedra_Azul_foto_YURI_BARICHIVICH.jpg') no-repeat top center fixed;
+    -moz-background-size: cover;
+    -moz-background-size: cover;
+    -webkit-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    width: 100%;
+    overflow: hidden;
+    /*
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+     */
+
+}
+
+
+.bg-1 .container-section{
+    /*
+     background-color: rgba(0, 0, 0, 0.4);
+     background-image: url(../Content/Images/dots.png); 
+    */
+    background-color: rgba(15,15,15,0.5);
+    color:white;
+}    
+
+  
+.bg-2 {
+	background: url('http://www.bootply.com/assets/example/bg_suburb.jpg') no-repeat top center fixed;
+    color:#fff;
+    background-size:cover;
+}
+
+
+.bg-3 {
+	background: url('http://www.bootply.com/assets/example/bg_blueplane.jpg') no-repeat bottom center fixed;
+    color:#fff;
+    background-size:cover;
+}
+
+

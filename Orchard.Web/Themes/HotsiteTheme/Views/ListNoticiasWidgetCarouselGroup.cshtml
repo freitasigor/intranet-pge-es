@@ -1,0 +1,42 @@
+@using Orchard.ContentManagement;
+@using Orchard.Utility.Extensions;
+@{
+
+    /*Para o correto funcionamento do Slider é nessecesario definir um valor para o Model.Id e
+ * adicionar a classe 'slider' e 'rp-carousel' ao Model.Classes*/
+    Model.Id = "slider-" + Model.ContentItem.Id;
+    Model.Classes.Add("slider");
+
+    var tag = Tag(Model, "div");
+    tag.AddCssClass("row");
+    var list = Model.ContentItems;
+    tag.AddCssClass("wow fadeInUp  animated");
+
+
+
+    IEnumerable<object> enumContentItens = list;
+    var quantItemList = enumContentItens.Count();
+
+    var index = 0;
+
+    @tag.StartElement
+
+        <!-- Wrapper for slides -->
+        <div class="owl-carousel owl-carousel-news owl-theme" data-items-perpage="3">
+            @foreach (var item in list)
+            {
+                var attr = "";
+                if (index == 0) { attr += "first active"; }
+                <div class="crsl-item col-xs-12 col-sm-12 col-md-12 col-lg-12 @attr"> 
+                    @Display(BuildDisplay(item, "SummaryNoticiaGroup"))
+                </div>
+                index++;
+            }
+        </div>
+        <input type="hidden" name="total-items" value="@index" />
+
+
+    @tag.EndElement
+    <!--/main slider carousel-->
+
+}

@@ -1,0 +1,134 @@
+﻿@{
+    string transparenciaURL = WorkContext.Layout.TransparenciaUrl.ToString();
+    string acessoInformacaoURL = WorkContext.Layout.AcessoInformacaoUrl.ToString();
+    string webmailURL = WorkContext.Layout.WebMailUrl.ToString();
+
+    string baseUrl = WorkContext.CurrentSite.BaseUrl;
+    string ambiente = "";
+    if (baseUrl.Contains(".des."))
+    {
+        ambiente = ".des";
+    }
+    else if (baseUrl.Contains(".dchm."))
+    {
+        ambiente = ".dchm";
+    }
+
+    string urlLostPassword = "//sistemas" + @ambiente + ".es.gov.br/prodest/autenticacao/WebForm/frmNovaSenha.aspx";
+
+}
+
+<div class="row">
+
+
+    <div class="span4 col-xs-12 col-sm-4 col-md-4 col-lg-4">
+        <span class="gov-name">Governo do Estado do Espírito Santo</span>
+    </div>
+    <div class="span8 col-xs-12 col-sm-8 col-md-8 col-lg-8">
+
+        <div class="gov-menu-wrapper">
+
+            <ol class="gov-menu">
+                @*
+                <li>
+                    <a href="javascript:void(0);" title="Ir para a página com o mapa do site">Mapa do Site</a> |
+                </li>
+                *@
+                @if (!String.IsNullOrEmpty(transparenciaURL))
+                {
+                    <li>
+                        <a href="@transparenciaURL" target="_blank" title="Ir para o portal da transparência">Portal da Transparência</a> |
+                    </li>
+                }
+                @if (!String.IsNullOrEmpty(acessoInformacaoURL))
+                {
+                    <li>
+                        <a href="@acessoInformacaoURL" target="_blank" title="Ir para a página de acesso à Informação pública">
+                            <img style="max-width: 100%;" src="//cdn.es.gov.br/images/logo/acesso-informacao/acessoInformacao_21x21.png" />
+                            <span class="legend">
+                                Acesso à Informação
+                            </span>
+                        </a>
+                        |
+                    </li>
+                }
+
+                @if (WorkContext.CurrentUser != null)
+                {
+
+                    <li class="dropdown">
+                        <ol type="a" class="gov-menu" id="menulogin">
+                            <li>
+
+                                <a href="javascript:viod(0);" id="userDropdown" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i>&nbsp;@Html.ItemDisplayText(WorkContext.CurrentUser) <b class="caret"></b></a> |
+                                <ol class="dropdown-menu" role="menu" aria-labelledby="userDropdown">
+                                    @if (AuthorizedFor(Orchard.Security.StandardPermissions.AccessAdminPanel))
+                                    {
+                                        <li>@Html.ActionLink(T("Painel de Controle").ToString(), "Index", new { Area = "Dashboard", Controller = "Admin" })</li>
+                                        <li class="divider"></li>
+                                    }
+                                    <li>
+                                        <a href="@urlLostPassword" target="_blank" title="Alterar Senha">Alterar Senha</a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>@Html.ActionLink(T("Sair").ToString(), "LogOff", new { Controller = "Account", Area = "Orchard.Users", ReturnUrl = Context.Request.RawUrl }, new { rel = "nofollow" })</li>
+
+                                </ol>
+
+
+                            </li>
+                        </ol>
+                    </li>
+
+                }
+                else
+                {
+
+                    <li>
+                        <a href="@Url.Action("LogOn", new { Controller = "Account", Area = "Orchard.Users", ReturnUrl = (Request.QueryString["ReturnUrl"] ?? Request.RawUrl) })" rel="nofollow" title="Logar no site">
+                            <i class="fa fa-lock circle-border"></i>
+                        </a>
+                        |
+                    </li>
+
+                }
+
+                @if (!String.IsNullOrEmpty(webmailURL))
+                {
+                    <li>
+                        <a href="@webmailURL" target="_blank" title="Acessar o Webmail">
+                            <i class="fa fa-envelope-o circle-border"></i>
+                        </a>
+                    </li>
+                }
+                <li>
+                    <ol type="a" class="gov-menu-accessibility">
+                        <li class="first-element constrast-element">
+                            <a title="Aplicar contraste" class="action-contraste" href="javascript:void(0);">
+                                <i class="fa fa-adjust"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a title="Retornar ao tamanho original do texto" class="jfontsize-d2" href="javascript:void(0);">
+                                <span class="icon-text">A=</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a title="Aumentar tamanho do texto" class="jfontsize-p2" href="javascript:void(0);">
+                                <span class="icon-text">A+</span>
+                            </a>
+                        </li>
+                        <li class="last-element">
+                            <a title="Diminuir tamanho do texto" class="jfontsize-m2" href="javascript:void(0);">
+                                <span class="icon-text">A-</span>
+                            </a>
+                        </li>
+
+                    </ol>
+                </li>
+            </ol>
+
+        </div>
+
+    </div>
+</div>

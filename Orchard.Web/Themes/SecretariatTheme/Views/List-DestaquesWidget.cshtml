@@ -1,0 +1,115 @@
+@{
+
+    var tag = Tag(Model, "ul");
+    tag.AddCssClass("list-items");
+    tag.AddCssClass("separate-boxes");
+    var list = Model.Items;
+
+    IEnumerable<object> enumContentItens = list;
+    var quantItemList = enumContentItens.Count();
+
+    var index = 0;
+
+    var backgroundColor = "";
+
+    try
+    {
+        if (Model.ContentItem.BackgroundColorPart.BackgroundColor.Value.ToLower() != "nenhuma")
+        {
+            backgroundColor = "bg-color-element bg-color-" + Model.ContentItem.BackgroundColorPart.BackgroundColor.Value.ToLower();
+        }
+    }
+    catch { }
+
+    @tag.StartElement
+
+        foreach (var item in list)
+        {
+            Orchard.ContentManagement.ContentItem contentItem = item.ContentItem;
+            var attr = "";
+            var title = "";
+            var urlField = "javascript:void(0);";
+            var fieldFileUrl = "";
+            var fieldContentUrl = "";
+            var fieldLinkUrl = "";
+            var target = "_self";
+
+            try
+            {
+                title = item.ContentItem.TitlePart.Title.ToString();
+            }
+            catch (System.Exception) { title = ""; }
+
+            try
+            {
+
+                foreach (var mediaPart in item.ContentItem.FilesPart.Arquivos.MediaParts)
+                {
+                    fieldFileUrl = mediaPart.MediaUrl;
+                }                
+                                
+            }
+            catch (System.Exception) { fieldFileUrl = ""; }
+            
+            try
+            {
+
+                foreach (var contentitems in item.ContentItem.ContentPart.Conteudo.ContentItems)
+                {
+                    fieldContentUrl = contentitems.AutoroutePart.DisplayAlias;
+                }                
+                
+            }
+            catch (System.Exception) { fieldContentUrl = ""; }
+
+            try
+            {
+                fieldLinkUrl = item.ContentItem.ExternalLinkPart.Link.Value;
+            }
+            catch (System.Exception) { fieldLinkUrl = ""; }
+
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(item.ContentItem.ExternalLinkPart.Link.Target))
+                {
+                    target = item.ContentItem.ExternalLinkPart.Link.Target;
+                }
+            }
+            catch (System.Exception) { target = "_self"; }
+
+            try
+            {
+                if (fieldFileUrl != "") { urlField = fieldFileUrl; target = "_blank"; }
+                else if (fieldContentUrl != "")
+                {
+                    urlField = Href("~/") + fieldContentUrl;
+                    target = "_self";
+                }
+                else if (fieldLinkUrl != "" && fieldLinkUrl != null) { urlField = fieldLinkUrl; }
+            }
+            catch (System.Exception) { urlField = "javascript:void(0);"; }            
+
+            try
+            {
+                if (index == 0) { attr += " first"; }
+                if (index == (quantItemList - 1)) { attr += " last"; }
+
+
+                <li class="row @backgroundColor @attr">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <h3>
+                            <a class="btn-link text-center" href="@urlField" target="@target" title="@title">@title</a>
+                        </h3>
+                    </div>
+                </li>
+                ++index;
+
+            }
+            catch (System.Exception ex) { ++index; }
+
+
+        }
+
+    @tag.EndElement
+
+}

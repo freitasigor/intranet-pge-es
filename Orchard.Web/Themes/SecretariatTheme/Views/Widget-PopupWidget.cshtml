@@ -1,0 +1,247 @@
+﻿@{
+
+    var attr = "";
+    var bgImage = "";
+    var freq_popup = "";
+    var size_popup = "";
+    var urlField = "";
+    var fieldFileUrl = "";
+    var fieldContentUrl = "";
+    var fieldLinkUrl = "";
+    var target = "_self";
+    bool show = true;
+
+
+
+    try
+    {
+        if (!String.IsNullOrEmpty(Model.ContentItem.ImagemPart.ImagemdeDestaque.FirstMediaUrl))
+        {
+            bgImage = "background-image: url(\"" + Display.ResizeMediaUrl(Width: 960, Height: 480, Mode: "max", Alignment: "middle", Path: Model.ContentItem.ImagemPart.ImagemdeDestaque.FirstMediaUrl) + "\");";
+            //bgImage = ""+Display.ResizeMediaUrl(Width: 960, Height: 480, Mode: "max", Alignment: "middle", Path: Model.ContentItem.ImagemPart.ImagemdeDestaque.FirstMediaUrl)+"";
+        }
+
+    }
+    catch (System.Exception) { bgImage = ""; }
+
+    try
+    {
+
+
+
+
+        if (!String.IsNullOrEmpty(Model.ContentItem.PopupWidget.FrequenciaPopup.Value))
+        {
+            freq_popup = Model.ContentItem.PopupWidget.FrequenciaPopup.Value;
+            switch (freq_popup)
+            {
+                case "Uma vez por dia":
+                    try
+                    {
+
+                        HttpCookie cookie = Request.Cookies["freqCookie"];
+
+                        if (cookie == null)
+                        {
+                            cookie = new HttpCookie("freqCookie");
+                            cookie.Value = DateTime.Now.AddDays(1.0).ToString();
+                            Response.Cookies.Add(cookie);
+                            show = true;
+                        }
+                        else
+                        {
+
+                            DateTime myDate, actualDate;
+                            if (!DateTime.TryParse(cookie.Value, out myDate)) { show = true; }//converte string em data, caso ocorra algum erro, define show como true
+                            else
+                            {
+                                actualDate = DateTime.Now;
+                                int result = DateTime.Compare(myDate, actualDate);
+                                if (result < 0)//Se ultrapassou data definida
+                                {
+                                    show = true;
+                                    cookie.Value = DateTime.Now.AddDays(1.0).ToString();
+                                    Response.SetCookie(cookie);
+                                    // Removendo o Cookie
+                                    //Response.Cookies["freqCookie"].Expires = DateTime.Now.AddDays(-1);
+                                }
+                                else { show = false; }//Se ainda não ultrapassou data definida
+                            }
+
+                        }
+
+                    }
+                    catch (System.Exception) { show = true; }
+
+                    break;
+
+                default:
+                    Response.Cookies["freqCookie"].Expires = DateTime.Now.AddDays(-1);
+                    show = true;
+                    break;
+
+            }
+        }
+
+    }
+    catch (System.Exception) { freq_popup = ""; }
+
+    try
+    {
+        if (!String.IsNullOrEmpty(Model.ContentItem.PopupWidget.TamanhoPopup.Value))
+        {
+            size_popup = Model.ContentItem.PopupWidget.TamanhoPopup.Value;
+            switch (size_popup)
+            {
+                case "Pequeno":
+                    size_popup = "modal-sm";
+                    break;
+                case "Grande":
+                    size_popup = "modal-lg";
+                    break;
+                default:
+                    size_popup = "";
+                    break;
+
+            }
+        }
+
+    }
+    catch (System.Exception) { size_popup = ""; }
+
+
+    try
+    {
+
+
+        foreach (var mediaPart in Model.ContentItem.FilesPart.Arquivos.MediaParts)
+        {
+            fieldFileUrl = mediaPart.MediaUrl;
+        }
+        foreach (var contentitems in Model.ContentItem.ContentPart.Conteudo.ContentItems)
+        {
+            fieldContentUrl = contentitems.AutoroutePart.DisplayAlias;
+        }
+
+        fieldLinkUrl = Model.ContentItem.ExternalLinkPart.Link.Value;
+        if (!string.IsNullOrWhiteSpace(Model.ContentItem.ExternalLinkPart.Link.Target))
+        {
+            target = Model.ContentItem.ExternalLinkPart.Link.Target;
+        }
+        if (fieldFileUrl != "") { urlField = fieldFileUrl; target = "_blank"; }
+        else if (fieldContentUrl != "")
+        {
+            urlField = Href("~/") + fieldContentUrl;
+            target = "_self";
+        }
+        else if (fieldLinkUrl != "" && fieldLinkUrl != null) { urlField = fieldLinkUrl; }
+
+    }
+    catch (System.Exception) { urlField = ""; target = "_self"; }
+
+
+}
+
+
+@if (show)
+{
+
+    <!-- Modal -->
+    @*Se imagem de fundo foi alimentada*@
+    if (!String.IsNullOrEmpty(bgImage))
+    {
+
+        <div class="modal fade modal-popup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            @try
+            {
+
+                if (!String.IsNullOrEmpty(Model.ContentItem.BodyPart.Text.ToString()))//Se imagem de fundo e Body foram alimentados
+                {
+                    <div class="modal fade modal-popup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                        <div class="modal-dialog @size_popup" role="document" style="margin-top:12%;">
+                            <div class="modal-content">
+
+                                <button title="Fechar" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
+
+                                <div class="modal-body" style="@bgImage">
+                                    @Html.Raw(Model.ContentItem.BodyPart.Text.ToString())
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                }
+                else//Se apenas a imagem de fundo foi alimentada
+                {
+                    <div class="modal-dialog @size_popup only-bg text-center" role="document" style="margin-top:12%;">
+                        <div class="modal-content">
+                            <button title="Fechar" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
+                            @if (!String.IsNullOrEmpty(urlField))
+                            { @Html.Raw("<a title=\"Acessar\" href=\"" + urlField + "\" target=\"" + target + "\">") }
+                            <img src="@Display.ResizeMediaUrl(Width: 960, Height: 480, Mode: "max", Alignment: "middle", Path: Model.ContentItem.ImagemPart.ImagemdeDestaque.FirstMediaUrl)" />
+                            @if (!String.IsNullOrEmpty(urlField))
+                            { @Html.Raw("</a>") }
+                        </div>
+                    </div>
+
+                }
+
+
+            }
+            catch (System.Exception)///caso ocorra algum, trata como se apenas a imagem de fundo tenha sido alimentada
+            {
+                <div class="modal-dialog @size_popup only-bg text-center" role="document" style="margin-top:12%;">
+                    <div class="modal-content">
+                        <button title="Fechar" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
+                        @if (!String.IsNullOrEmpty(urlField))
+                        { @Html.Raw("<a title=\"Acessar\" href=\"" + urlField + "\" target=\"" + target + "\">") }
+                        <img src="@Display.ResizeMediaUrl(Width: 960, Height: 480, Mode: "max", Alignment: "middle", Path: Model.ContentItem.ImagemPart.ImagemdeDestaque.FirstMediaUrl)" />
+                        @if (!String.IsNullOrEmpty(urlField))
+                        { @Html.Raw("</a>") }
+                    </div>
+                </div>
+
+            }
+        </div>
+    }
+    else //se a imagem de fundo nao foi alimentada
+    {
+
+        try
+        {
+            if (!String.IsNullOrEmpty(Model.ContentItem.BodyPart.Text.ToString()))//Se Body foi alimentado ou se existe
+            {
+                <div class="modal fade modal-popup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog @size_popup" role="document" style="margin-top:12%;">
+                        <div class="modal-content">
+                            <button title="Fechar" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
+
+                            <div class="modal-body">
+                                @Html.Raw(Model.ContentItem.BodyPart.Text.ToString())
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            }
+
+        }
+        catch (System.Exception) { }
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+

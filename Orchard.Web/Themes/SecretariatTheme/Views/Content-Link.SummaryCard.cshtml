@@ -1,0 +1,380 @@
+﻿@using System;
+@using Orchard.ContentManagement;
+@using System.Text.RegularExpressions;
+
+@{
+
+    var title = "";
+    var urlImage = "";
+    var urlField = "";
+    var target = "_self";
+
+    string typeContent = Model.ContentItem.ContentType;
+    dynamic objContent = null;
+
+    IDictionary<string, string> infoCard = new Dictionary<string, string>();
+
+    infoCard["resumo"] = "";
+    infoCard["desconto"] = "";
+    infoCard["ramo"] = "";
+    infoCard["produtos"] = "";
+    infoCard["address"] = "";
+    infoCard["cidade"] = "";
+    infoCard["uf"] = "";
+
+
+    IDictionary < string, ContentField> fieldsArray = new Dictionary<string, ContentField>();
+    IDictionary<string, int> col = new Dictionary<string, int>();
+    col["lg"] = 6;
+    col["md"] = 6;
+    col["sm"] = 8;
+
+
+    @*======================
+        Type Content
+    ======================*@
+    try
+    {
+
+        if (typeContent == "Link")
+        {
+            objContent = Model.ContentItem.Link;
+        
+        }
+
+
+    }
+    catch (System.Exception) { }
+
+
+    @*======================
+        Title Card    
+    ======================*@
+    try
+    {
+        title = Model.ContentItem.TitlePart.Title.ToString();
+    }
+    catch (System.Exception) { }
+
+    @*======================
+        Image Card    
+    ======================*@
+    try
+    {
+        if (!String.IsNullOrEmpty(Model.ContentItem.ImagemPart.ImagemdeDestaque.FirstMediaUrl))
+        {
+            urlImage = Model.ContentItem.ImagemPart.ImagemdeDestaque.FirstMediaUrl;
+        }
+    }
+    catch (System.Exception) { }
+
+    @*======================
+        Values Fields Card    
+    ======================*@
+    try
+    {
+        foreach (var item in Model.Content.Items)
+        {
+            string name = item.ContentField.Name;
+            fieldsArray[name] = item.ContentField;
+        }
+    }
+    catch (System.Exception) { }
+
+    @* ====== Field: Resumo ======= *@
+
+    try
+    {
+        if (fieldsArray.ContainsKey("Resumo")) {
+            dynamic item = fieldsArray["Resumo"];
+            if (!String.IsNullOrEmpty(item.Value))
+            {
+                infoCard["resumo"] = item.Value;
+            }
+
+        }
+
+    }
+    catch (System.Exception) { }
+
+    @* ====== Field: URL ======= *@
+
+    try
+    {
+
+        if (fieldsArray.ContainsKey("Url"))
+        {
+            dynamic item = fieldsArray["Url"];
+            if (!String.IsNullOrEmpty(item.Value))
+            {
+                urlField = item.Value;
+            }
+
+        }
+
+        if (fieldsArray.ContainsKey("AbriremNovaJanela"))
+        {
+            dynamic item = fieldsArray["AbriremNovaJanela"];
+            if (item.Value)
+            {
+                target = "_blank";
+            }
+
+        }
+
+    }
+    catch (System.Exception) { }
+
+    @* ====== Field: Desconto ======= *@
+    try
+    {
+
+        if (fieldsArray.ContainsKey("Desconto"))
+        {
+            dynamic item = fieldsArray["Desconto"];
+            if (item.Value > 0)
+            {
+                infoCard["desconto"]  = item.Value.ToString();
+            }
+
+        }
+
+
+    }
+    catch (System.Exception) { }
+
+    @* ====== Field: Endereco ======= *@
+    try
+    {
+
+        if (fieldsArray.ContainsKey("Endereco"))
+        {
+
+            dynamic item = fieldsArray["Endereco"];
+            if (!String.IsNullOrEmpty(item.Value))
+            {
+                infoCard["address"] = item.Value;
+            }
+
+        }
+
+
+    }
+    catch (System.Exception) { }
+
+    @* ====== Field: Estado ======= *@
+    try
+    {
+
+        if (fieldsArray.ContainsKey("Estado"))
+        {
+
+            dynamic item = fieldsArray["Estado"];
+            if (!String.IsNullOrEmpty(item.Value))
+            {
+                infoCard["uf"] = item.Value;
+            }
+
+        }
+
+
+    }
+    catch (System.Exception) { }
+
+
+    @* ====== Field: Segmento ======= *@
+
+    try
+    {
+
+        if (objContent != null)
+        {
+            var flag = 0;
+            foreach (dynamic term in objContent.Segmento.Terms)
+            {
+                if (flag > 0)
+                {
+                    infoCard["ramo"] = infoCard["ramo"] + ", ";
+                }
+                infoCard["ramo"] = infoCard["ramo"] + term.Name.Trim();
+                flag = 1;
+            }
+        }
+    }
+    catch (System.Exception) { }
+
+
+    @* ====== Field: Produtos/Serviços ======= *@
+
+    try
+    {
+
+        if (objContent != null)
+        {
+            var flag = 0;
+            foreach (dynamic term in objContent.Produtos.Terms)
+            {
+                if (flag > 0)
+                {
+                    infoCard["produtos"] = infoCard["produtos"] + ", ";
+                }
+                infoCard["produtos"] = infoCard["produtos"] + term.Name.Trim();
+                flag = 1;
+            }
+        }
+    }
+    catch (System.Exception) { }
+
+
+    @* ====== Field: Cidade ======= *@
+
+    try
+    {
+
+        if (objContent != null)
+        {
+            var flag = 0;
+            foreach (dynamic term in objContent.Cidade.Terms)
+            {
+                if (flag > 0)
+                {
+                    infoCard["cidade"] = infoCard["cidade"] + ", ";
+                }
+                infoCard["cidade"] = infoCard["cidade"] + term.Name.Trim();
+                flag = 1;
+            }
+        }
+    }
+    catch (System.Exception) { }
+
+
+
+try
+{
+    <div class="row container-licitacoes item-link" 
+         @if(!String.IsNullOrEmpty(infoCard["ramo"])){ @Html.Raw("data-ramo=\""+ infoCard["ramo"] + "\"")}  
+         @if(!String.IsNullOrEmpty(infoCard["produtos"])){ @Html.Raw("data-produtos=\""+ infoCard["produtos"] + "\"")}
+         @if(!String.IsNullOrEmpty(infoCard["uf"])){ @Html.Raw("data-estado=\""+ infoCard["uf"] + "\"")}
+         @if(!String.IsNullOrEmpty(infoCard["cidade"])){ @Html.Raw("data-cidade=\""+ infoCard["cidade"] + "\"")}
+         @if(!String.IsNullOrEmpty(infoCard["desconto"])){ @Html.Raw("data-desconto=\""+ infoCard["desconto"] + "%\"")}
+         >
+
+    @{
+    
+        if (!String.IsNullOrEmpty(urlImage))
+        {
+
+            <div class="col-sm-12 col-md-3 col-lg-3">
+                @if (!String.IsNullOrEmpty(urlField))
+                {
+                @Html.Raw("<a href=\"" + urlField + "\" class=\"thumbnail\" target=\"" + target + "\" title=\"Acessar site\">");
+                }
+                <img src="@Display.ResizeMediaUrl(Width: 215, Height: 90, Mode: "pad", Alignment: "middlecenter", Path: urlImage, PadColor: "white")" alt="Logomarca - @title" />
+
+                @if (!String.IsNullOrEmpty(urlField))
+                {
+                @Html.Raw("</a>");
+                }
+            </div>
+        }
+        else
+        {
+            col["lg"] = col["lg"] + 3;
+            col["md"] = col["md"] + 3;
+        }
+
+        if(String.IsNullOrEmpty(infoCard["desconto"]) && String.IsNullOrEmpty(urlField))
+        {
+            col["lg"] = col["lg"] + 3;
+            col["md"] = col["md"] + 3;
+            col["sm"] = col["sm"] + 4;
+        }
+        <div class="col-sm-@col["sm"] col-md-@col["md"] col-lg-@col["lg"] desc-item text-left">
+            <h4 class="title-item">@title</h4>
+            @if (!String.IsNullOrEmpty(infoCard["ramo"]))
+            {
+                <div>
+                    <strong>@objContent.Segmento.DisplayName</strong><span>: </span>
+                    <span class="segmento-value">@infoCard["ramo"]</span>
+                </div>
+            }
+            @if (!String.IsNullOrEmpty(infoCard["produtos"]))
+            {
+                <div>
+                    <strong>@objContent.Produtos.DisplayName</strong><span>: </span>
+                    <span class="segmento-value">@infoCard["produtos"]</span>
+                </div>
+            }
+            
+
+            @if (!String.IsNullOrEmpty(infoCard["address"]))
+            {
+                <strong>Endereço: </strong><span class="address-value">@infoCard["address"]</span><span>,</span>
+            }
+
+            @if (!String.IsNullOrEmpty(infoCard["cidade"]))
+            {
+                <span class="cidade-value">@infoCard["cidade"]</span>
+            }
+
+            @if (!String.IsNullOrEmpty(infoCard["uf"]))
+            {
+                <span class="comma">/</span><span class="uf-value">@infoCard["uf"]</span>
+            }
+            
+            @Html.Raw(infoCard["resumo"])
+
+        </div>
+
+        if (!String.IsNullOrEmpty(infoCard["desconto"]) || !String.IsNullOrEmpty(urlField))
+        {
+            <div class="col-sm-4 col-md-3 col-lg-3 sale text-center">
+                @if (!String.IsNullOrEmpty(infoCard["desconto"]))
+                {
+                    <div class="tag">
+                        <div class="price"><span class="desconto-value">@infoCard["desconto"]</span><span>%</span></div>
+                        <div class="label-price">de desconto</div>
+                    </div>
+                }
+
+                @try
+                {
+                    if (!String.IsNullOrEmpty(Model.ContentItem.CommonPart.Container.ListadeLinks.TextodoBotao.Value))
+                    {
+                        if (!String.IsNullOrEmpty(urlField))
+                        {
+                            <div class="read-more">
+                                <a href="@urlField" target="@target" title="@Model.ContentItem.CommonPart.Container.ListadeLinks.TextodoBotao.Value"><i class="fa fa-external-link" aria-hidden="true"></i> @Model.ContentItem.CommonPart.Container.ListadeLinks.TextodoBotao.Value</a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        if (!String.IsNullOrEmpty(urlField))
+                        {
+                            <div class="read-more">
+                                <a href="@urlField" target="@target" title="Acessar site"><i class="fa fa-external-link" aria-hidden="true"></i> Acessar site</a>
+                            </div>
+                        }
+                    }
+
+                }
+                catch (System.Exception)
+                {
+                    if (!String.IsNullOrEmpty(urlField))
+                    {
+                        <div class="read-more">
+                            <a href="@urlField" target="@target" title="Acessar site"><i class="fa fa-external-link" aria-hidden="true"></i> Acessar site</a>
+                        </div>
+                    }
+
+                }
+
+            </div>
+        }
+
+    }
+    </div>
+    }
+    catch (System.Exception ex) { }
+}

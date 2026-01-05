@@ -1,0 +1,91 @@
+﻿@using Orchard.Utility.Extensions;
+@{
+    if (Model.Title != null) {
+        Layout.Title = Model.Title;
+    }
+ 
+    /*Begin class collapse*/
+    var expanded = "false";
+    var collapseClass = "";
+    var panelClass = "";
+    var iconPanel = "";
+    
+    try
+    {
+        int qtdContents = Model.ContentItem.CommonPart.Container.ContainerPart.ItemCount;
+        if (qtdContents == 1)
+        {
+            expanded = "true";
+            collapseClass = "in";
+            panelClass = "painel-ativo active";
+            iconPanel = "fa-minus";
+        }        
+    }
+    catch (System.Exception ex) { }    
+    /*end class collapse*/    
+    
+    
+}
+ 
+<div class="panel-heading @panelClass" role="tab" id="heading-@Model.ContentItem.Id">
+    <a class="" data-toggle="collapse" href="#collapse-@Model.ContentItem.Id" aria-expanded="@expanded" aria-controls="collapse-@Model.ContentItem.Id">
+        <h4 class="panel-title">
+            @if (!String.IsNullOrEmpty(Model.ContentItem.TitlePart.Title.ToString()))
+            {
+                @Model.ContentItem.TitlePart.Title.ToString()
+            }
+            <i class="fa fa-plus @iconPanel"></i>
+        </h4>
+        <span class="bottom-triangle active"></span>
+    </a>
+</div>
+
+<div id="collapse-@Model.ContentItem.Id" class="panel-collapse collapse @collapseClass" role="tabpanel" aria-labelledby="heading-@Model.ContentItem.Id">
+
+    <div class="panel-body">
+
+        <div class="span-12 col-lg-12 column-contato">
+
+            @try
+            {
+
+                if (Model.ContentItem.Contato.Fields.Count > 0)
+                {
+                    var descricaoTitular = "Titular";
+                    foreach (var infoContato in Model.ContentItem.Contato.Fields)
+                    {
+                        if (infoContato.Name == "NovaDescricaoparacampoTitular" && !String.IsNullOrEmpty(infoContato.Value))
+                        {
+                            descricaoTitular = infoContato.Value;
+                        }
+                    }
+                    foreach (var infoContato in Model.ContentItem.Contato.Fields)
+                    {
+                        if (!String.IsNullOrEmpty(infoContato.Value))
+                        {
+                            if (infoContato.Name == "Titular")
+                            {
+                                <div class="info-contato">
+                                    <strong class="info-title">@descricaoTitular<span>:</span></strong>
+                                    <div class="info-value">@infoContato.Value</div>
+                                </div>
+                            }
+                            else if (!String.IsNullOrEmpty(infoContato.Value) && infoContato.Name != "NovaDescricaoparacampoTitular")
+                            {
+                                <div class="info-contato">
+                                    <strong class="info-title">@infoContato.DisplayName<span>:</span></strong>
+                                    <div class="info-value">@infoContato.Value</div>
+                                </div>
+                            }
+                        }  
+                    }
+                }
+                                                                                                                                           
+            }
+            catch (System.Exception ex) { }  
+
+        </div>
+
+    </div><!-- panel-body -->
+</div><!-- panel-collapse -->
+

@@ -1,0 +1,46 @@
+﻿
+@{
+    // Model is Model.Menu from the layout (Layout.Menu)
+    bool useFixedNav = true;
+    
+    if (useFixedNav) {
+        Model.Classes.Add("nav navbar-nav navbar-right");
+    }
+    else {
+        Model.Classes.Add("nav nav-pills");
+    }
+
+    var tag = Tag(Model, "ul");
+
+    var items = (IList<dynamic>)Enumerable.Cast<dynamic>(Model.Items);
+
+    if (items.Any()) {
+        items[0].Classes.Add("first");
+        items[items.Count - 1].Classes.Add("last");
+    }    
+}
+
+@tag.StartElement
+@* see MenuItem shape template *@
+@DisplayChildren(Model)
+
+@*
+    @if (WorkContext.CurrentUser != null) {
+        <li class="dropdown menu-color-color">
+            <a href="#" id="userDropdown" class="dropdown-toggle menu-color-color menu-background-color-background-color" data-toggle="dropdown"><i class="icon-user"></i>&nbsp;@Html.ItemDisplayText(WorkContext.CurrentUser) <b class="caret"></b></a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="userDropdown">
+                <li>@Html.ActionLink(T("Alterar Senha").ToString(), "ChangePassword", new { Controller = "Account", Area = "Orchard.Users" })</li>
+                <li>@Html.ActionLink(T("Sair").ToString(), "LogOff", new { Controller = "Account", Area = "Orchard.Users", ReturnUrl = Context.Request.RawUrl }, new { rel = "nofollow" })</li>
+                @if (AuthorizedFor(Orchard.Security.StandardPermissions.AccessAdminPanel)) {
+                    <li class="divider"></li>
+                    <li>@Html.ActionLink(T("Painel de Controle").ToString(), "Index", new { Area = "Dashboard", Controller = "Admin" })</li>
+                }
+            </ul>
+        </li>
+    }
+    else {
+        <li>@Html.ActionLink(T("Fazer login").ToString(), "LogOn", new { Controller = "Account", Area = "Orchard.Users", ReturnUrl = (Request.QueryString["ReturnUrl"] ?? Request.RawUrl) }, new { rel = "nofollow" })</li>
+    }
+*@
+
+@tag.EndElement

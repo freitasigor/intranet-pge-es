@@ -1,0 +1,211 @@
+﻿/**CSSdoc
+*     
+* Landing Page PRODEST
+*
+* Standard layout for Landing Page PRODEST
+*
+* This style sheet describes the
+* structure and the main components
+* about Landing Page PRODEST interface
+* 
+* @project Landing Page PRODEST
+* @version 1.0 2016-3-18
+* @since 1.0
+* @package layout
+* @author Lucas Matias Caetano <lucas.caetano@prodest.es.gov.br>
+* @used http://www.prodest.es.gov.br
+* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+*
+*/
+
+/*=======================================================================================*/
+/**
+* General Structure
+*
+* General structure and common
+* components of website
+*
+* @section general
+*/
+
+html {
+    background-color: #3573A7;
+    height: 100%;
+    background: url(../../Content/fiscal-cidadao/bg_rows_image.png) no-repeat left top #3573A7;
+    background-size: cover;
+    background-attachment: fixed;
+}
+body{
+    background:transparent;
+    font-family: 'GeometosRounded-Regular','Open Sans',Tahoma,verdana,Arial,sans-serif;
+    font-weight: normal;
+	color:#fff;
+    height: 100%;
+    text-shadow: 0px 1px 1px #4A4A4A;
+    
+			
+}
+a{color: white;text-decoration: underline;}
+
+/*Header*/
+.landing-header{background-color: rgba(40,76,110,0.5);margin-bottom: 40px;}
+.landing-header .thumbnail{background: none;border: none;padding-top: 10%;}
+
+.landing-header .thumbnail>img.logo-fiscal-cidadao, 
+.landing-header .thumbnail a>img.logo-fiscal-cidadao{
+    max-width: 210px;
+    margin-left: 11px;
+}
+.landing-header .thumbnail>img.logo-governo, 
+.landing-header .thumbnail a>img.logo-governo{
+    max-width: 190px;
+}
+
+.landing-header .title{}
+
+
+/*Content*/
+.wrapper iframe{
+    height:480px;
+}
+.wrapper .content{
+    margin-bottom: 5px;
+}
+
+.btn-store{
+    margin-bottom: 15px;
+    display: inline-block;
+
+}
+
+/*Login*/
+.login-user .page-title{display:none;}
+.login-user  p{
+    font-size: 1.7em;
+    color: #4d4d4d;
+    text-shadow: none;
+}
+.login-user button.primaryAction{
+    width: 100%;
+    color: #fff;
+    background-color: #337ab7;
+    border: none;
+    border: 1px solid #2e6da4;
+    height: 44px;
+    border-radius: 5px;
+    font-size: 1.2em;
+}
+.login-user legend{
+    text-shadow: none;
+    color: white;
+    height: 1px;
+    margin-bottom: 20px;
+}
+.login-user label{color: #4d4d4d; text-shadow: none;}
+.login-user ol{list-style:none;}
+.login-user  li{ margin-bottom: 12px;}
+
+.login-user input{
+    display: block;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+
+/*IE*/
+html.ie8,
+html.ie7{
+    background-image: none;
+    text-align:center;
+}
+html.ie8 .img-responsive,
+html.ie7 .img-responsive{display:inline-block;}
+
+/*=======================================================================================*/
+/**
+* Media Query
+*
+* Media Query
+*
+* @section media query
+*/
+
+
+
+@media (max-width: 768px) {
+    .landing-header .title{
+        text-align:center;
+        margin-top: 7px;
+    }
+
+    .landing-header .thumbnail>img.logo-fiscal-cidadao, 
+    .landing-header .thumbnail a>img.logo-fiscal-cidadao,
+    .landing-header .thumbnail>img.logo-governo, 
+    .landing-header .thumbnail a>img.logo-governo{
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    .landing-header .thumbnail{
+        padding-top: 20px;
+    }
+    .wrapper .content {
+        margin-bottom: 10px;
+    }
+    .wrapper iframe {
+        height: 400px;
+    }
+}
+
+@media (max-width: 400px) {
+    .wrapper{padding-top: 5px;text-align: center;}
+    .header{
+        margin-top: 10px;
+        margin-bottom: 5px;
+        font-size: 64px;
+        line-height: 88px;
+    }
+    .wrapper iframe {
+        height: 280px;
+    }
+}
+
+@media (max-width: 992px) {
+    html{background-image: none;}
+
+    .landing-header .thumbnail>img.logo-fiscal-cidadao, 
+    .landing-header .thumbnail a>img.logo-fiscal-cidadao{
+        max-width: 190px;
+    }
+    .landing-header .thumbnail>img.logo-governo, 
+    .landing-header .thumbnail a>img.logo-governo{
+        max-width: 170px;
+    }
+
+}
+
+
+
+@media (min-width: 768px) {
+
+    .landing-header .content-title{    padding-left: 15px;}
+
+}
+
+@media (min-width: 992px) {
+
+    .landing-header .content-title{    padding-left: 0;}
+
+}
+

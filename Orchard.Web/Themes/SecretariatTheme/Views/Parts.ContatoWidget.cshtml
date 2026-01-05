@@ -1,0 +1,49 @@
+﻿@{
+
+    string nameInstitute = WorkContext.Layout.NomeInstituicao.ToString();
+    string abbreviationInstitute = WorkContext.Layout.SiglaInstituicao.ToString();
+
+    string siteName = Convert.ToString(WorkContext.CurrentSite.SiteName);
+
+    var tag = Tag(Model, "p");
+    //tag.AddCssClass("row");
+    var contato = Model.Contato;
+    @tag.StartElement
+                <b class="name-institute">
+                    @if (!string.IsNullOrEmpty(contato.Instituicao) || !string.IsNullOrEmpty(nameInstitute))
+                    {
+                        if (!string.IsNullOrEmpty(contato.Instituicao))
+                        { @Html.Raw(contato.Instituicao) }
+                        else{
+                            @Html.Raw(nameInstitute)
+                        }
+
+                        if (!string.IsNullOrEmpty(abbreviationInstitute))
+                        { @Html.Raw(" ("+abbreviationInstitute+")") }
+
+                    }
+                    else {
+                        @Html.Raw(siteName)
+                     }
+                </b>
+                <br />
+                if (!string.IsNullOrEmpty(contato.Endereco))
+                { @Html.Raw(@contato.Endereco) }
+                if (!string.IsNullOrEmpty(contato.Bairro))
+                { @Html.Raw(" - " + @contato.Bairro)}
+                if (!string.IsNullOrEmpty(contato.Cep))
+                { @Html.Raw("<br/>CEP: " + @contato.Cep) }
+                if (!string.IsNullOrEmpty(contato.Cidade))
+                { @Html.Raw(" - " + @contato.Cidade) }
+                if (!string.IsNullOrEmpty(contato.Uf))
+                {@Html.Raw(" / " + @contato.Uf) }
+                if (!string.IsNullOrEmpty(contato.Tel))
+                { @Html.Raw("<br/> Tel.: " + @contato.Tel) }
+                if (!string.IsNullOrEmpty(contato.Fax))
+                { @Html.Raw(" / Fax:" + @contato.Fax) }
+                if (!string.IsNullOrEmpty(contato.Email))
+                {  @Html.Raw("<br/>E-mail: <a title=\"Enviar e-mail\" style=\"text-decoration:underline;\" href=\"mailto:" + @contato.Email + "\" target=\"_top\">" + @contato.Email + "</a>")}
+
+    @tag.EndElement
+
+}

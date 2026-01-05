@@ -1,0 +1,40 @@
+﻿@using Orchard.ContentManagement
+@using Orchard.MediaLibrary.Fields
+@using Orchard.Utility.Extensions;
+
+@{
+    var field = (MediaLibraryPickerField) Model.ContentField;
+    string name = field.DisplayName;
+    var contents = field.MediaParts;
+    var contentManager = Model.ContentItem.ContentManager;
+}
+
+
+@if (field.Name == "Imagens")
+{
+
+    try
+    {
+        if (!String.IsNullOrEmpty(Model.ContentItem.Album.Descricao.Value))
+        {
+            <div class="row content-body" >
+                <div class="span-12 col-lg-12">
+                    @Html.Raw(Model.ContentItem.Album.Descricao.Value)
+                    <hr class="album-separator" />
+                </div>
+            </div>
+        }
+    }
+    catch (System.Exception ex) { }
+
+    <section class="row gallery album-gallery media-library-picker-field media-library-picker-field-@name.HtmlClassify()" id="album-list-items-@Model.ContentItem.Id">
+
+        @foreach (var content in contents)
+        {
+            @Display(contentManager.BuildDisplay(content.ContentItem, "SummaryImageAlbum"))
+        }
+    </section>
+    <div class="row"><div class="span-12 col-lg-12"><ul data-container="album-list-items-@Model.ContentItem.Id" class="pager album-pagination"></ul></div></div>
+
+}
+

@@ -1,0 +1,32 @@
+@{
+
+    var tag = Tag(Model, "ul");
+    tag.AddCssClass("social-foot");
+    var list = Model.MidiasSociais.Modelo;
+
+    @tag.StartElement
+
+
+
+    foreach (var item in list)
+    {
+
+        var urlField = "";
+        var target = "_blank";
+        var redesocial = item.nome;
+        urlField = item.url;
+
+        if (!string.IsNullOrEmpty(urlField))
+        {
+            <li>
+                <a title="@redesocial" href="@urlField" target="@target" class="social-icon">
+                    <i class="fa fa-@redesocial"></i>
+                </a>
+            </li>
+
+        }
+    }
+
+    @tag.EndElement
+
+}

@@ -1,0 +1,119 @@
+﻿@using Orchard.Taxonomies.Models;
+@using Orchard.Taxonomies.Services;
+@using Orchard.ContentManagement;
+@using Orchard.Utility.Extensions;
+@using Orchard.Mvc.Html;
+@using System.Linq;
+
+@*
+    This shape displays a term and all content items associated to it.
+    - ContentItems is a List shape
+    - Pager is a Pager shape
+    - Taxonomy is the parent taxonomy
+    - ContentPart is the TermPart displayed
+*@
+
+@{
+
+    Model.Id = "list-cards-" + Model.ContentItem.Id;
+    var tag = Tag(Model, "div");
+    tag.AddCssClass("col-lg-12 row-licitacoes list-cards");
+
+    Model.ContentItems.Classes.Add("content-items");
+
+    var urlBase = Href("~/");
+
+    var contentManager = Model.ContentItem.ContentManager;
+
+}
+
+
+    <form id="taxonomyForm">
+            @{
+                Orchard.ContentManagement.ContentItem[] taxonomia = contentManager.HqlQuery().ForType("Taxonomy").List();
+                Func<ContentItem, bool>
+                    init = s => s.Id == Model.Taxonomy.Id;
+                var taxonomyPart = taxonomia.Where(new Func<ContentItem, bool>
+                    (init)).FirstOrDefault<ContentItem>
+                        ().As<TaxonomyPart>();
+            }
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <label class="text-uppercase"><strong>@taxonomyPart.Name</strong></label>
+                        <select id="taxonomia-@taxonomyPart.Id" class="form-control" name="@taxonomyPart.Name">
+                            <option value="">Selecione...</option>
+                            @foreach (var termPart in taxonomyPart.Terms)
+                            {
+                                <option value="@urlBase@termPart.Slug" @if (Model.ContentItem.TitlePart.Title == termPart.Name) { @Html.Raw("selected")}>@termPart.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-12 text-right">
+                    <button type="submit" class="btn btn-primary btn-md background-primary-button-background-color primary-button-border-border-color font-color-primary-button-color">Pesquisar</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        document.forms["taxonomyForm"].onsubmit = function (e) {
+            e.preventDefault(); //cancel form submit
+            var str1 = "taxonomia-";
+            var str2 = [];
+            var link = "";
+            @{
+                    @Html.Raw("str2.push("+ Model.Taxonomy.Id + ");");
+            }
+            for (i = 0; i < str2.length; i++) {
+                var el = document.getElementById(str1.concat(str2[i]));
+                var selectedArea = el.options[el.selectedIndex].value;
+                if (selectedArea) {
+                    link = selectedArea;
+                }
+            }
+            window.open(link,'_self');
+
+            //post searchValue to your PHP page using your favorite JS library,
+            //then in the call back, submit your form with self.submit();
+        };
+    </script>
+
+   
+
+    <div class="row custom-list-link">
+
+
+
+        <div id="list-cards">
+            @tag.StartElement
+
+            @if (Model.ContentItems.Items.Count > 0)
+            {
+                foreach (var item in Model.ContentItems.Items)
+                {
+
+                    @Display(BuildDisplay(item.ContentItem, "SummaryCard"))
+
+                }
+            }
+            else
+            {
+                <div class="col-lg-12 text-center">
+                    <h3>Nenhum item encontrado</h3>
+                </div>
+            }
+
+        @tag.EndElement
+    </div>
+
+
+    </div>
+
+    @*@Display(Model.ContentItems)*@
+    @Display(Model.Pager)

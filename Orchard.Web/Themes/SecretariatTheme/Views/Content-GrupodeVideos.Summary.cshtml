@@ -1,0 +1,72 @@
+﻿@using Orchard.Utility.Extensions;
+@using System.Linq;
+@{
+    if (Model.Title != null) {
+        Layout.Title = Model.Title;
+    }
+    
+    var contentTypeClassName = ((string)Model.ContentItem.ContentType).HtmlClassify();
+    Model.Classes.Add(contentTypeClassName);
+    Model.Classes.Add("content-item");
+
+    Orchard.ContentManagement.ContentItem contentItem = Model.ContentItem;  
+
+    string thumbnail = "";
+    
+    if(Model.ContentItem.GrupodeVideos.Videos.MediaParts.Count > 0){
+        var oembed = Model.ContentItem.GrupodeVideos.Videos.MediaParts[0].ContentItem.OEmbedPart;
+        thumbnail = oembed["thumbnail_url"] ?? oembed["thumbnail"];
+    }
+
+}
+
+<div class="album-item">
+    <div class="thumbnail effect-6">
+        <div class="img">
+
+            @if (!String.IsNullOrEmpty(thumbnail))
+            {
+                var bgImage = "background-image: url(\"" + Display.ResizeMediaUrl(Width: 800, height: 800, Mode: "pad", Alignment: "middlecenter", Path: thumbnail) + "\");";
+                <div class="imagem" style="@bgImage"></div>
+            }
+
+            <div class="overlay" onclick="location.href='@Url.ItemDisplayUrl(contentItem)'">
+                <a href="@Url.ItemDisplayUrl(contentItem)" class="mybutton expand" title="Ver Fotos">Ver Vídeos</a>
+                <a class="close-overlay hidden">x</a>
+            </div>
+
+
+        </div>
+    </div>
+    <div class="content-album">
+
+        <h4 class="title-album">
+            <a class="link-color-color" href="@Url.ItemDisplayUrl(contentItem)" title="Ver Vídeos">
+                @if (!String.IsNullOrEmpty(Model.ContentItem.TitlePart.Title.ToString()))
+                {
+                    @Model.ContentItem.TitlePart.Title.ToString()
+                }
+            </a>
+        </h4>
+
+        @try
+        {
+            if (!String.IsNullOrEmpty(Model.ContentItem.GrupodeVideos.Descricao.Value))
+            {
+                string excerptHtml = Model.ContentItem.GrupodeVideos.Descricao.Value;
+                var excerpt = new HtmlString(Html.Excerpt(excerptHtml, 200).ToString().Replace(Environment.NewLine, "</p>" + Environment.NewLine + "<p>"));
+                <div class="excerpt-album">@excerpt</div>
+
+            }
+        }
+        catch (System.Exception ex) { }
+
+        <div class="leia-mais">
+            <a href="@Url.ItemDisplayUrl(contentItem)" title="Ver Vídeos" class="leia-mais-link">
+                <span>Ver Vídeos</span><i class="ion-ios-arrow-right"></i>
+            </a>
+        </div>
+
+    </div>
+
+</div>
